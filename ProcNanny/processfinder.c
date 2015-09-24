@@ -3,8 +3,8 @@
 #include <assert.h>
 
 struct ProcessData {
-	char[64] PID;
-	char[64] CMD;
+	char[32] PID;
+	char[32] CMD;
 } ProcessData;
 
 const size_t MaxNumberOfProcesses = 256;
@@ -41,7 +41,7 @@ int GetPSOutput(char** output, size_t maxProcess, size_t maxLineSize){
 }
 
 int ConstructProcess(ProcessData* process, Char* psOutput){
-	char[4][64] fields = { 0 };
+	char[4][32] fields = { 0 };
 	int fieldIndex = 0;
 	int fieldCharacterIndex = 0;
 
