@@ -2,18 +2,26 @@
 #include <stdlib.h>
 #include <assert.h>
 
-struct Process {
-	long int PID;
-	char* CMD;
-} Process;
+struct ProcessData {
+	char[64] PID;
+	char[64] CMD;
+} ProcessData;
 
-const int MaxNumberOfProcesses = 256;
+const size_t MaxNumberOfProcesses = 256;
 const size_t MaxLineSize = 128;
 
-int GetRunningProcesses(Process* processes, int* numProcesses){
+int GetRunningProcesses(ProcessData* processes, int* numProcesses){
 
 	char[MaxNumberOfProcesses][maxLineSize] psOutput = { 0 };
-	GetPSOutput(psOutput, MaxNumberOfProcesses, maxLineSize)
+	GetPSOutput(psOutput, MaxNumberOfProcesses, MaxLineSize)
+	psOutput++ //First line of output is headers, skip over.
+	for (int i = 0; i < MaxNumberOfProcesses; i++){
+		if (psOutput[i] == 0) break;
+		ConstructProcess(&processes[i], psOutput[i]);
+		*numProcesses++;
+	}
+
+	return 0;
 }
 
 int GetPSOutput(char** output, size_t maxProcess, size_t maxLineSize){
@@ -30,4 +38,26 @@ int GetPSOutput(char** output, size_t maxProcess, size_t maxLineSize){
 	}
 	pclose(output);
 	return 0;
+}
+
+int ConstructProcess(ProcessData* process, Char* psOutput){
+	char[4][64] fields = { 0 };
+	int fieldIndex = 0;
+	int fieldCharacterIndex = 0;
+
+	while(*psOutput != 0){
+		while(*psOutput != 32){
+			fields[fieldIndex][fieldCharacterIndex++] = *psOutput;
+		}
+
+		while(*psOutput++ == 32){} //eat all spaces
+		fieldIndex++;
+		fieldCharacterIndex = 0;
+	}
+
+	*process.PID = fields[0];
+	*process.CMD = fields[3];
+
+	return 0;
+
 }
