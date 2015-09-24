@@ -46,11 +46,12 @@ int ConstructProcess(ProcessData* process, Char* psOutput){
 	int fieldCharacterIndex = 0;
 
 	while(*psOutput != 0){
-		while(*psOutput != 32){
+
+		while(*psOutput++ == 32){} //eat all spaces
+		while(*psOutput != 32){ //copy in field
 			fields[fieldIndex][fieldCharacterIndex++] = *psOutput;
 		}
 
-		while(*psOutput++ == 32){} //eat all spaces
 		fieldIndex++;
 		fieldCharacterIndex = 0;
 	}
