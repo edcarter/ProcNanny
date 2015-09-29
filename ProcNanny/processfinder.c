@@ -48,7 +48,7 @@ int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize){
 }
 
 int ConstructProcess(ProcessData* process, char* psOutput){
-	char fields[4][32] = { 0 };
+	char fields[4][32] = {{0}};
 	int fieldIndex = 0;
 	int fieldCharacterIndex = 0;
 
