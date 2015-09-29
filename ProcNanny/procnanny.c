@@ -1,5 +1,14 @@
-int main(){
+#include "processfinder.h"
+#include <stdlib.h>
+#include <assert.h>
 
+int main(){
+	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
+	ProcessData* processes = (ProcessData*)Malloc(maxNumberOfProcesses * sizeof(ProcessData));
+	int processesRunning;
+	if (GetRunningProcesses(processes, &processesRunning)){
+		assert(false, "could not get running processes");
+	}
 	//Kill Other ProcNanny Processes
 
 	//Read In Config File

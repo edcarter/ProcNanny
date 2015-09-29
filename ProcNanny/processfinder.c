@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "processfinder.h"
 
-struct ProcessData {
-	char[32] PID;
-	char[32] CMD;
-} ProcessData;
 
 const size_t MaxNumberOfProcesses = 256;
 const size_t MaxLineSize = 128;
@@ -24,13 +21,17 @@ int GetRunningProcesses(ProcessData* processes, int* numProcesses){
 	return 0;
 }
 
+int GetMaxNumberOfProcesses(){
+	return MaxNumberOfProcesses;
+}
+
 int GetPSOutput(char** output, size_t maxProcess, size_t maxLineSize){
 	FILE* output;
 	int lineNumber = 0;
 
 	output = popen("ps", "r");
 	if (output == NULL){
-		assert("Could Not Get PS Output");
+		assert(false, "Could Not Get PS Output");
 		return -1;
 	}
 	while (fgets(output[lineNumber], maxLineSize-1, fp) != NULL){
