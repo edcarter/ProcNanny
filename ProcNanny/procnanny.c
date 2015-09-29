@@ -4,10 +4,10 @@
 
 int main(){
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
-	ProcessData* processes = (ProcessData*)Malloc(maxNumberOfProcesses * sizeof(ProcessData));
+	ProcessData* processes = (ProcessData*)malloc(maxNumberOfProcesses * sizeof(ProcessData));
 	int processesRunning;
 	if (GetRunningProcesses(processes, &processesRunning)){
-		assert(false, "could not get running processes");
+		assert(0);
 	}
 	//Kill Other ProcNanny Processes
 

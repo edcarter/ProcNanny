@@ -7,15 +7,21 @@
 const size_t MaxNumberOfProcesses = 256;
 const size_t MaxLineSize = 128;
 
+extern FILE *popen( const char *command, const char *modes);
+extern void *memcpy(void *str1, const void *str2, size_t n);
+extern int pclose(FILE *stream);
+int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize);
+int ConstructProcess(ProcessData* process, char* psOutput);
+
 int GetRunningProcesses(ProcessData* processes, int* numProcesses){
 
-	char[MaxNumberOfProcesses][maxLineSize] psOutput = { 0 };
-	GetPSOutput(psOutput, MaxNumberOfProcesses, MaxLineSize)
-	psOutput++ //First line of output is headers, skip over.
+	char psOutput[256][128];
+	*numProcesses = 0;
+	GetPSOutput(psOutput, MaxNumberOfProcesses, MaxLineSize);
 	for (int i = 0; i < MaxNumberOfProcesses; i++){
-		if (psOutput[i] == 0) break;
-		ConstructProcess(&processes[i], psOutput[i]);
-		*numProcesses++;
+		if (psOutput[i+1][0] == 0) break;
+		ConstructProcess(&processes[i], psOutput[i+1]);
+		(*numProcesses)++;
 	}
 
 	return 0;
@@ -25,40 +31,41 @@ int GetMaxNumberOfProcesses(){
 	return MaxNumberOfProcesses;
 }
 
-int GetPSOutput(char** output, size_t maxProcess, size_t maxLineSize){
-	FILE* output;
+int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize){
+	FILE* foutput;
 	int lineNumber = 0;
 
-	output = popen("ps", "r");
-	if (output == NULL){
-		assert(false, "Could Not Get PS Output");
+	foutput = popen("ps", "r");
+	if (foutput == NULL){
+		assert(0);
 		return -1;
 	}
-	while (fgets(output[lineNumber], maxLineSize-1, fp) != NULL){
+	while (fgets(output[lineNumber], maxLineSize-1, foutput) != NULL){
 		lineNumber++;
 	}
-	pclose(output);
+	pclose(foutput);
 	return 0;
 }
 
-int ConstructProcess(ProcessData* process, Char* psOutput){
-	char[4][32] fields = { 0 };
+int ConstructProcess(ProcessData* process, char* psOutput){
+	char fields[4][32] = { 0 };
 	int fieldIndex = 0;
 	int fieldCharacterIndex = 0;
 
 	while(*psOutput != 0){
 
-		while(*psOutput++ == 32){} //eat all spaces
-		while(*psOutput != 32){ //copy in field
+		while(*psOutput == 32 && *psOutput != 0){psOutput++;} //eat all spaces
+		while(*psOutput != 32 && *psOutput != 0){ //copy in field
 			fields[fieldIndex][fieldCharacterIndex++] = *psOutput;
+			psOutput++;
 		}
 
 		fieldIndex++;
 		fieldCharacterIndex = 0;
 	}
 
-	*process.PID = fields[0];
-	*process.CMD = fields[3];
+	memcpy(process->PID, fields[0], 32);
+	memcpy(process->CMD, fields[3], 32);
 
 	return 0;
 
