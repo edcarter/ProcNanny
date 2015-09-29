@@ -7,9 +7,9 @@
 const size_t MaxNumberOfProcesses = 256;
 const size_t MaxLineSize = 128;
 
-extern FILE *popen( const char *command, const char *modes);
-extern void *memcpy(void *str1, const void *str2, size_t n);
-extern int pclose(FILE *stream);
+FILE *popen( const char *command, const char *modes);
+void *memcpy(void *str1, const void *str2, size_t n);
+int pclose(FILE *stream);
 int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize);
 int ConstructProcess(ProcessData* process, char* psOutput);
 

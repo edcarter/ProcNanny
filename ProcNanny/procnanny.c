@@ -7,8 +7,11 @@ int strcmp(const char *str1, const char *str2);
 int getpid(void);
 int Kill(ProcessData process);
 int IsOtherProcnanny(ProcessData process);
+int sprintf(char *str, const char *format, ...);
 
 int main(){
+
+	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
 	ProcessData* processes = (ProcessData*)malloc(maxNumberOfProcesses * sizeof(ProcessData));
 	int processesRunning;
@@ -16,12 +19,12 @@ int main(){
 		assert(0);
 	}
 
+	//Kill Other ProcNanny Processes
 	for (int i = 0; i < processesRunning; i++){
 		if (IsOtherProcnanny(processes[i])){
 			Kill(processes[i]);
 		}
 	}
-	//Kill Other ProcNanny Processes
 
 	//Read In Config File
 
@@ -42,6 +45,7 @@ int main(){
 int IsOtherProcnanny(ProcessData process){
 	int thisPid = getpid();
 	char thisPidString[32];
+	sprintf(thisPidString, "%d", thisPid);
 	if (!strcmp(process.CMD, "procnanny")){
 		if (strcmp(thisPidString, process.PID)){ //If PIDs are different
 			return 1;
