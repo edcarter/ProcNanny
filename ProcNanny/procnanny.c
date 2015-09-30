@@ -1,4 +1,5 @@
 #include "processfinder.h"
+#include "config.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
@@ -9,7 +10,11 @@ int Kill(ProcessData process);
 int IsOtherProcnanny(ProcessData process);
 int sprintf(char *str, const char *format, ...);
 
-int main(){
+int main(int argc, char *argv[]){
+
+	assert(argc >= 2);
+
+	char* configLocation = argv[1];
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
@@ -26,7 +31,12 @@ int main(){
 		}
 	}
 
+	char configProcesses[128][256] = {0};
+	int killTime;
+
+
 	//Read In Config File
+	GetConfigInfo(configLocation, configProcesses, &killTime);
 
 	//Set Up Log File
 

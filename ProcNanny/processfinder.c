@@ -5,7 +5,7 @@
 
 
 const size_t MaxNumberOfProcesses = 128;
-const size_t MaxLineSize = 128;
+const size_t MaxLineSize = 256;
 
 FILE *popen( const char *command, const char *modes);
 void *memcpy(void *str1, const void *str2, size_t n);
