@@ -39,6 +39,7 @@ int main(){
 	//Clean up Children
 
 	//Log metadata and exit
+	free(processes);
 
 }
 

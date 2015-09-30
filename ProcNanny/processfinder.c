@@ -4,18 +4,18 @@
 #include "processfinder.h"
 
 
-const size_t MaxNumberOfProcesses = 256;
+const size_t MaxNumberOfProcesses = 128;
 const size_t MaxLineSize = 128;
 
 FILE *popen( const char *command, const char *modes);
 void *memcpy(void *str1, const void *str2, size_t n);
 int pclose(FILE *stream);
-int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize);
+int GetPSOutput(char output[128][256], size_t maxProcess, size_t maxLineSize);
 int ConstructProcess(ProcessData* process, char* psOutput);
 
 int GetRunningProcesses(ProcessData* processes, int* numProcesses){
 
-	char psOutput[256][128];
+	char psOutput[128][256];
 	*numProcesses = 0;
 	GetPSOutput(psOutput, MaxNumberOfProcesses, MaxLineSize);
 	for (int i = 0; i < MaxNumberOfProcesses; i++){
@@ -31,7 +31,7 @@ int GetMaxNumberOfProcesses(){
 	return MaxNumberOfProcesses;
 }
 
-int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize){
+int GetPSOutput(char output[128][256], size_t maxProcess, size_t maxLineSize){
 	FILE* foutput;
 	int lineNumber = 0;
 
@@ -48,7 +48,7 @@ int GetPSOutput(char output[256][128], size_t maxProcess, size_t maxLineSize){
 }
 
 int ConstructProcess(ProcessData* process, char* psOutput){
-	char fields[4][32] = {{0}};
+	char fields[4][256] = {{0}};
 	int fieldIndex = 0;
 	int fieldCharacterIndex = 0;
 
