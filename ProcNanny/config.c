@@ -5,16 +5,20 @@
 int getline(char **lineptr, int *n, FILE *stream);
 int atoi(const char *str);
 
-int GetConfigInfo(char* configLocation, char processNames[128][256], int* killTime){
+int GetConfigInfo(char* configLocation, char processNames[128][256], int* numProcesses, int* killTime){
 	FILE* configFile = fopen(configLocation, "r");
 	if (configFile == NULL) assert(0);
 	int read;
 	int len = 127;
-	char killTimeStr[128];
-	read = getline(&killTimeStr, &len, configFile);
+	*numProcesses = 0;
+	char killTimeStr[128] = { 0 };
+	char* pString = killTimeStr;
+	read = getline(&pString, &len, configFile);
 	for (int i = 0; i < 128; i++){
-		read = getline(&processNames[i], &len, configFile);
+		pString = processNames[i];
+		read = getline(&pString, &len, configFile);
 		if (read == -1) break;
+		(*numProcesses)++;
 	}
 
 	*killTime = atoi(killTimeStr);

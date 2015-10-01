@@ -31,12 +31,11 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	char configProcesses[128][256] = {0};
-	int killTime;
-
-
 	//Read In Config File
-	GetConfigInfo(configLocation, configProcesses, &killTime);
+	int processesToMonitor;
+	char configProcesses[128][256] = {{0}};
+	int killTime;
+	GetConfigInfo(configLocation, configProcesses, &processesToMonitor, &killTime);
 
 	//Set Up Log File
 

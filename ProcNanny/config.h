@@ -1,1 +1,1 @@
-int GetConfigInfo(char* configLocation, char processNames[128][256], int* killTime);
+int GetConfigInfo(char* configLocation, char processNames[128][256], int* numProcesses, int* killTime);
