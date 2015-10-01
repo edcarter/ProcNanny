@@ -35,7 +35,7 @@ int GetPSOutput(char output[128][256], size_t maxProcess, size_t maxLineSize){
 	FILE* foutput;
 	int lineNumber = 0;
 
-	foutput = popen("ps", "r");
+	foutput = popen("ps a -o \"%p %y %x %c\"", "r");
 	if (foutput == NULL){
 		assert(0);
 		return -1;

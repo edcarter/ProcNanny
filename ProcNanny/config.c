@@ -32,18 +32,22 @@ int GetConfigInfo(char* configLocation, char processNames[128][256], int* numPro
 ProcessData* GetProcessesToTrack(ProcessData* processesRunning, char processesInConfig[128][256], int inputCount, int* outputCount){
 	*outputCount = 0;
 
-	for (int i = 0; i < inputCount; i++){
-		if (!strcmp(processesInConfig[i], processesRunning[i].CMD)){
-			(*outputCount)++;
+	for (int i = 0; i < 128; i++){
+		for (int j = 0; j < inputCount; j++){
+			if (!strcmp(processesInConfig[i], processesRunning[j].CMD)){
+				(*outputCount)++;
+			}
 		}
 	}
 
-	ProcessData* processesToTrack = (ProcessData*) malloc(*outputCount * sizeof(ProcessData));
+	ProcessData* processesToTrack = (ProcessData*) calloc(*outputCount, sizeof(ProcessData));
 	ProcessData* walkingProcessesToTrack = processesToTrack;
 
-	for (int i = 0; i < *outputCount; i++){
-		if (!strcmp(processesInConfig[i], processesRunning[i].CMD)){
-			*walkingProcessesToTrack++ = processesRunning[i];
+	for (int i = 0; i < 128; i++){
+		for (int j = 0; j < inputCount; j++){
+			if (!strcmp(processesInConfig[i], processesRunning[j].CMD)){
+				*walkingProcessesToTrack++ = processesRunning[j];
+			}
 		}
 	}
 
