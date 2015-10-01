@@ -32,14 +32,16 @@ int main(int argc, char *argv[]){
 	}
 
 	//Read In Config File
-	int processesToMonitor;
+	int numProcessesInConfig;
 	char configProcesses[128][256] = {{0}};
 	int killTime;
-	GetConfigInfo(configLocation, configProcesses, &processesToMonitor, &killTime);
+	GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig, &killTime);
 
-	//Set Up Log File
+	//Set Up Log File (TODO)
 
 	//Check What Processes out of config are actually running
+	int numProcessesToMonitor;
+	ProcessData* processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
 
 	//Fork Child Processes for each monitor
 
@@ -48,8 +50,8 @@ int main(int argc, char *argv[]){
 	//Clean up Children
 
 	//Log metadata and exit
+	free(processesToMonitor);
 	free(processes);
-
 }
 
 int IsOtherProcnanny(ProcessData process){

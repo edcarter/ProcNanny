@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 #include "config.h"
 
 int getline(char **lineptr, int *n, FILE *stream);
@@ -25,4 +27,25 @@ int GetConfigInfo(char* configLocation, char processNames[128][256], int* numPro
 	fclose(configFile);
 
 	return 0;
+}
+
+ProcessData* GetProcessesToTrack(ProcessData* processesRunning, char processesInConfig[128][256], int inputCount, int* outputCount){
+	*outputCount = 0;
+
+	for (int i = 0; i < inputCount; i++){
+		if (!strcmp(processesInConfig[i], processesRunning[i].CMD)){
+			(*outputCount)++;
+		}
+	}
+
+	ProcessData* processesToTrack = (ProcessData*) malloc(*outputCount * sizeof(ProcessData));
+	ProcessData* walkingProcessesToTrack = processesToTrack;
+
+	for (int i = 0; i < *outputCount; i++){
+		if (!strcmp(processesInConfig[i], processesRunning[i].CMD)){
+			*walkingProcessesToTrack++ = processesRunning[i];
+		}
+	}
+
+	return processesToTrack; //make sure to free this
 }
