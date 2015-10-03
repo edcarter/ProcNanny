@@ -1,5 +1,6 @@
 #include "processfinder.h"
 #include "config.h"
+#include "logger.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
@@ -23,6 +24,8 @@ int main(int argc, char *argv[]){
 
 	char* configLocation = argv[1];
 	char* logPath = getenv("PROCNANNYLOGS");
+
+	ReportProcessNotRunning(logPath, 0); //DELETE ME!
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
