@@ -54,13 +54,13 @@ int ReportTotalProcessesKilled(char* logLocation, int processesKilled){
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
 	strtok(dateTimeBuffer, "\n");
-	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed.\n", dateTimeBuffer, processesKilled);
+	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed.\n\n", dateTimeBuffer, processesKilled);
 	return fclose(logFile);
 }
 
 //flush changes
 int FlushLogger(char* logLocation){
-	FILE* logFile = fopen(logLocation, loggingMode);
+	FILE* logFile = OpenFile(logLocation);
 	int success = fflush(logFile);
 	return fclose(logFile) && success;
 }
