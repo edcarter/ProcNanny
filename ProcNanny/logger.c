@@ -18,23 +18,44 @@ int ReportProcessNotRunning(char* logLocation, ProcessData* processdata){
 	char processNameBuffer[256] = {0};
 	strcpy(processNameBuffer, processdata->CMD);
 	strtok(processNameBuffer, "\n");
-	fprintf(logFile, "[%s] Info: No \'%s\' processes found.", dateTimeBuffer, processNameBuffer);
+	fprintf(logFile, "[%s] Info: No \'%s\' processes found.\n", dateTimeBuffer, processNameBuffer);
 	return fclose(logFile);
 }
 
 //print monitoring processes
 int ReportMonitoringProcess(char* logLocation, ProcessData* processdata){
-
+	FILE* logFile = OpenFile(logLocation);
+	char dateTimeBuffer[256] = {0};
+	GetDateTimeFormat(dateTimeBuffer);
+	strtok(dateTimeBuffer, "\n");
+	char processNameBuffer[256] = {0};
+	strcpy(processNameBuffer, processdata->CMD);
+	strtok(processNameBuffer, "\n");
+	fprintf(logFile, "[%s] Info: Initializing monitoring of process \'%s\' (PID %s).\n", dateTimeBuffer, processNameBuffer, processdata->PID);
+	return fclose(logFile);
 }
 
 //print process killed
 int ReportProcessKilled(char* logLocation, ProcessData* processdata, int waitTime){
-
+	FILE* logFile = OpenFile(logLocation);
+	char dateTimeBuffer[256] = {0};
+	GetDateTimeFormat(dateTimeBuffer);
+	strtok(dateTimeBuffer, "\n");
+	char processNameBuffer[256] = {0};
+	strcpy(processNameBuffer, processdata->CMD);
+	strtok(processNameBuffer, "\n");
+	fprintf(logFile, "[%s] Action: PID %s (\'%s\') killed after exceeding %d seconds.\n", dateTimeBuffer, processdata->PID, processNameBuffer, waitTime);
+	return fclose(logFile);
 }
 
 //report total number of processes killed on exit
 int ReportTotalProcessesKilled(char* logLocation, int processesKilled){
-
+	FILE* logFile = OpenFile(logLocation);
+	char dateTimeBuffer[256] = {0};
+	GetDateTimeFormat(dateTimeBuffer);
+	strtok(dateTimeBuffer, "\n");
+	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed.\n", dateTimeBuffer, processesKilled);
+	return fclose(logFile);
 }
 
 //flush changes
@@ -52,6 +73,7 @@ int ConvertHomePathToAbsolute(char* relPath, char* absPath){
 	strcpy(relPathBuffer, relPath);
 	strcat(absPath, homePath);
 	strcat(absPath, pBuffer);
+	return 0;
 }
 
 FILE* OpenFile(char* path){

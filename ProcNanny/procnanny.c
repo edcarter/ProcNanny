@@ -28,7 +28,11 @@ int main(int argc, char *argv[]){
 
 	ProcessData data = {{0}};
 	strcpy(data.CMD, "TESTCOMMAND\n");
+	strcpy(data.PID, "1234");
 	ReportProcessNotRunning(logPath, &data); //DELETE ME!
+	ReportMonitoringProcess(logPath, &data); //DELETE ME!
+	ReportProcessKilled(logPath, &data, 120); //DELETE ME!
+	ReportTotalProcessesKilled(logPath, 3); //DELETE ME!
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
