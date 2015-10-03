@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h> //might not need this
 
 int strcmp(const char *str1, const char *str2);
 int getpid(void);
@@ -25,7 +26,9 @@ int main(int argc, char *argv[]){
 	char* configLocation = argv[1];
 	char* logPath = getenv("PROCNANNYLOGS");
 
-	ReportProcessNotRunning(logPath, 0); //DELETE ME!
+	ProcessData data = {{0}};
+	strcpy(data.CMD, "TESTCOMMAND\n");
+	ReportProcessNotRunning(logPath, &data); //DELETE ME!
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
