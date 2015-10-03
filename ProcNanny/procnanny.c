@@ -22,6 +22,7 @@ int main(int argc, char *argv[]){
 	assert(argc >= 2);
 
 	char* configLocation = argv[1];
+	char* logPath = getenv("PROCNANNYLOGS");
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
