@@ -1,8 +1,9 @@
-#include "logger.h"
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include "logger.h"
+#include "memwatch.h"
 
 char* loggingMode = "a";
 

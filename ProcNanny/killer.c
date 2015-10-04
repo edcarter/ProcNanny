@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "killer.h"
+#include "memwatch.h"
 
 int sprintf(char *str, const char *format, ...);
 

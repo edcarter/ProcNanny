@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"
+#include "memwatch.h"
 
 int getline(char **lineptr, int *n, FILE *stream);
 int atoi(const char *str);

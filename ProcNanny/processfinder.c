@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "processfinder.h"
+#include "memwatch.h"
 
 
 const size_t MaxNumberOfProcesses = 128;

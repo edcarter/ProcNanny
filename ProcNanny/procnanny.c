@@ -1,11 +1,12 @@
-#include "processfinder.h"
-#include "config.h"
-#include "logger.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <string.h> //might not need this
+#include <string.h> 
+#include "processfinder.h"
+#include "config.h"
+#include "logger.h"
+#include "memwatch.h"
 
 typedef struct MonitorData {
 	int monitorPID;
@@ -28,14 +29,6 @@ int main(int argc, char *argv[]){
 
 	char* configLocation = argv[1];
 	char* logPath = getenv("PROCNANNYLOGS");
-
-	// ProcessData data = {{0}};
-	// strcpy(data.CMD, "TESTCOMMAND\n");
-	// strcpy(data.PID, "1234");
-	// ReportProcessNotRunning(logPath, &data); //DELETE ME!
-	// ReportMonitoringProcess(logPath, &data); //DELETE ME!
-	// ReportProcessKilled(logPath, &data, 120); //DELETE ME!
-	// ReportTotalProcessesKilled(logPath, 3); //DELETE ME!
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
@@ -76,7 +69,10 @@ int main(int argc, char *argv[]){
 		childPID = fork();
 		if (childPID >= 0){
 			if (childPID ==0){ // child process
-				MonitorProcess(processToMonitor, killTime);
+				free(monitors);
+				free(processesToMonitor);
+				free(processes);
+				MonitorProcess(processToMonitor, killTime); //this does not return
 			} else { //parent process
 				monitors[i].monitorPID = childPID;
 				ReportMonitoringProcess(logPath, &processToMonitor);
