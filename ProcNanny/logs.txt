@@ -1,0 +1,14 @@
+[Sun Oct  4 17:38:34 2015] Info: No 'test' processes found.
+[Sun Oct  4 17:38:34 2015] Info: Initializing monitoring of process 'b.out' (PID 25842).
+[Sun Oct  4 17:38:39 2015] Info: Exiting. 0 process(es) killed.
+
+[Sun Oct  4 17:39:15 2015] Info: No 'test' processes found.
+[Sun Oct  4 17:39:15 2015] Info: Initializing monitoring of process 'b.out' (PID 25908).
+[Sun Oct  4 17:39:20 2015] Action: PID 25908 ('b.out') killed after exceeding 5 seconds.
+[Sun Oct  4 17:39:20 2015] Info: Exiting. 1 process(es) killed.
+
+[Sun Oct  4 17:42:09 2015] Info: No 'test' processes found.
+[Sun Oct  4 17:42:09 2015] Info: Initializing monitoring of process 'b.out' (PID 26047).
+[Sun Oct  4 17:42:14 2015] Action: PID 26047 ('b.out') killed after exceeding 5 seconds.
+[Sun Oct  4 17:42:14 2015] Info: Exiting. 1 process(es) killed.
+
