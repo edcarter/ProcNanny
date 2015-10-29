@@ -53,7 +53,7 @@ int ReportMonitoringProcess(char* logLocation, ProcessData* processdata){
 }
 
 //print process killed
-int ReportProcessKilled(char* logLocation, ProcessData* processdata, int waitTime){
+int ReportProcessKilled(char* logLocation, ProcessData* processdata){
 	FILE* logFile = OpenFile(logLocation);
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
@@ -61,7 +61,7 @@ int ReportProcessKilled(char* logLocation, ProcessData* processdata, int waitTim
 	char processNameBuffer[256] = {0};
 	strcpy(processNameBuffer, processdata->CMD);
 	strtok(processNameBuffer, "\n");
-	fprintf(logFile, "[%s] Action: PID %s (\'%s\') killed after exceeding %d seconds.\n", dateTimeBuffer, processdata->PID, processNameBuffer, waitTime);
+	fprintf(logFile, "[%s] Action: PID %s (\'%s\') killed after exceeding %d seconds.\n", dateTimeBuffer, processdata->PID, processNameBuffer, processdata->killTime);
 	return fclose(logFile);
 }
 

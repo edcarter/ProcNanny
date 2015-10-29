@@ -16,5 +16,13 @@ limitations under the License.
 
 #include "processfinder.h"
 
-int GetConfigInfo(char* configLocation, char processNames[128][256], int* numProcesses, int* killTime);
-ProcessData* GetProcessesToTrack(ProcessData* processesRunning, char processesInConfig[128][256], int inputCount, int* outputCount);
+#ifndef CONFIGDATA
+#define CONFIGDATA
+typedef struct ConfigData {
+	char CMD[256];
+	int killTime;
+} ConfigData;
+#endif
+
+int GetConfigInfo(char* configLocation, ConfigData* configs, int* numProcesses);
+ProcessData* GetProcessesToTrack(ProcessData* processesRunning, ConfigData* configs, int inputCount, int* outputCount);

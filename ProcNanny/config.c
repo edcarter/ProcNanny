@@ -23,36 +23,55 @@ limitations under the License.
 #include "memwatch.h"
 
 int getline(char **lineptr, int *n, FILE *stream);
+void ConstructConfigData(char line[256], ConfigData* configData);
 int atoi(const char *str);
 
-int GetConfigInfo(char* configLocation, char processNames[128][256], int* numProcesses, int* killTime){
+int GetConfigInfo(char* configLocation, ConfigData* configs, int* numProcesses){
 	FILE* configFile = fopen(configLocation, "r");
 	if (configFile == NULL) assert(0);
 	int read;
-	int len = 127;
+	int len = 256;
 	*numProcesses = 0;
-	char killTimeStr[128] = { 0 };
-	char* pString = killTimeStr;
-	read = getline(&pString, &len, configFile);
+	char String[256] = {0};
+	char* pString = String;
+
 	for (int i = 0; i < 128; i++){
-		pString = processNames[i];
 		read = getline(&pString, &len, configFile);
 		if (read == -1) break;
+		ConstructConfigData(pString, configs + i);
 		(*numProcesses)++;
 	}
-
-	*killTime = atoi(killTimeStr);
 	fclose(configFile);
 
 	return 0;
 }
 
-ProcessData* GetProcessesToTrack(ProcessData* processesRunning, char processesInConfig[128][256], int inputCount, int* outputCount){
+void ConstructConfigData(char line[256], ConfigData* configData){
+	int space_index = 0;
+	for( ; space_index < 256; space_index++){
+		if (line[space_index] == ' ') break;
+	}
+	assert(space_index < 256);
+	char timeString[256] = {0};
+	memcpy(timeString, line, space_index - 1);
+	configData->killTime = atoi(timeString);
+	int newline_index = space_index;
+
+	for ( ; newline_index < 256; ){
+		newline_index++;
+		if (line[newline_index] == '\n') break;
+	}
+	assert(space_index < 256);
+	memset(configData->CMD, 0, 256);
+	memcpy(configData->CMD, line + space_index + 1, newline_index - space_index);
+}
+
+ProcessData* GetProcessesToTrack(ProcessData* processesRunning, ConfigData* configs, int inputCount, int* outputCount){
 	*outputCount = 0;
 
 	for (int i = 0; i < 128; i++){
 		for (int j = 0; j < inputCount; j++){
-			if (!strcmp(processesInConfig[i], processesRunning[j].CMD)){
+			if (!strcmp(configs[i].CMD, processesRunning[j].CMD)){
 				(*outputCount)++;
 			}
 		}
@@ -63,7 +82,7 @@ ProcessData* GetProcessesToTrack(ProcessData* processesRunning, char processesIn
 
 	for (int i = 0; i < 128; i++){
 		for (int j = 0; j < inputCount; j++){
-			if (!strcmp(processesInConfig[i], processesRunning[j].CMD)){
+			if (!strcmp(configs[i].CMD, processesRunning[j].CMD)){
 				*walkingProcessesToTrack++ = processesRunning[j];
 			}
 		}

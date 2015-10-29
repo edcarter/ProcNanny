@@ -23,7 +23,7 @@ int ReportProcessNotRunning(char* logLocation, ProcessData* processdata);
 int ReportMonitoringProcess(char* logLocation, ProcessData* processdata);
 
 //print process killed
-int ReportProcessKilled(char* logLocation, ProcessData* processdata, int waitTime);
+int ReportProcessKilled(char* logLocation, ProcessData* processdata);
 
 //report total number of processes killed on exit
 int ReportTotalProcessesKilled(char* logLocation, int processesKilled);

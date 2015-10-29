@@ -19,6 +19,7 @@ limitations under the License.
 typedef struct ProcessData {
 	char PID[32];
 	char CMD[256];
+	int killTime;
 } ProcessData;
 #endif
 
