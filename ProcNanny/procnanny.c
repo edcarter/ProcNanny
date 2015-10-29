@@ -87,6 +87,7 @@ int main(int argc, char *argv[]){
 				free(monitors);
 				free(processesToMonitor);
 				free(processes);
+				free(configProcesses);
 				MonitorProcess(processToMonitor); //this does not return
 			} else { //parent process
 				monitors[i].monitorPID = childPID;
@@ -122,6 +123,7 @@ int main(int argc, char *argv[]){
 	free(monitors);
 	free(processesToMonitor);
 	free(processes);
+	free(configProcesses);
 }
 
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors){

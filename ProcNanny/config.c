@@ -52,9 +52,9 @@ void ConstructConfigData(char line[256], ConfigData* configData){
 		if (line[space_index] == ' ') break;
 	}
 	assert(space_index < 256);
-	char timeString[256] = {0};
-	memcpy(timeString, line, space_index - 1);
-	configData->killTime = atoi(timeString);
+	memset(configData->CMD, 0, 256);
+	memcpy(configData->CMD, line, space_index);
+	configData->CMD[space_index] = '\n';
 	int newline_index = space_index;
 
 	for ( ; newline_index < 256; ){
@@ -62,8 +62,9 @@ void ConstructConfigData(char line[256], ConfigData* configData){
 		if (line[newline_index] == '\n') break;
 	}
 	assert(space_index < 256);
-	memset(configData->CMD, 0, 256);
-	memcpy(configData->CMD, line + space_index + 1, newline_index - space_index);
+	char timeString[256] = {0};
+	memcpy(timeString, line + space_index + 1, newline_index - space_index); //sub by 1
+	configData->killTime = atoi(timeString);
 }
 
 ProcessData* GetProcessesToTrack(ProcessData* processesRunning, ConfigData* configs, int inputCount, int* outputCount){
@@ -83,7 +84,9 @@ ProcessData* GetProcessesToTrack(ProcessData* processesRunning, ConfigData* conf
 	for (int i = 0; i < 128; i++){
 		for (int j = 0; j < inputCount; j++){
 			if (!strcmp(configs[i].CMD, processesRunning[j].CMD)){
-				*walkingProcessesToTrack++ = processesRunning[j];
+				*walkingProcessesToTrack = processesRunning[j];
+				walkingProcessesToTrack->killTime = configs[i].killTime;
+				walkingProcessesToTrack++;
 			}
 		}
 	}
