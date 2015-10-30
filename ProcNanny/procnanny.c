@@ -18,7 +18,8 @@ limitations under the License.
 #include <assert.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <string.h> 
+#include <string.h>
+#include <signal.h> 
 #include "processfinder.h"
 #include "config.h"
 #include "logger.h"
@@ -26,8 +27,14 @@ limitations under the License.
 
 typedef struct MonitorData {
 	int monitorPID;
+	int pipe[2];
 	ProcessData* monitoredProcessData;
 } MonitorData;
+
+typedef struct PipeData {
+	char type[4]; //NEW or EXT
+	ProcessData monitoredProcess;
+} PipeData;
 
 int strcmp(const char *str1, const char *str2);
 int getpid(void);
@@ -38,8 +45,12 @@ void MonitorProcess(ProcessData process);
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors);
 int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProcesses, int numConfigProcesses, int numRunningProcesses, char* logLocation);
 
+int exiting = 0;
+int reReadConfig = 0;
 
 int main(int argc, char *argv[]){
+	signal(SIGINT, HandleSigint);
+	signal(SIGHUP, HandleSighup);
 
 	assert(argc >= 2);
 
@@ -88,6 +99,7 @@ int main(int argc, char *argv[]){
 				free(processesToMonitor);
 				free(processes);
 				free(configProcesses);
+				RunChild();
 				MonitorProcess(processToMonitor); //this does not return
 			} else { //parent process
 				monitors[i].monitorPID = childPID;
@@ -116,6 +128,10 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	while(!exiting){
+
+	}
+
 	//Log metadata and exit
 	ReportTotalProcessesKilled(logPath, totalKilled);
 
@@ -124,6 +140,14 @@ int main(int argc, char *argv[]){
 	free(processesToMonitor);
 	free(processes);
 	free(configProcesses);
+}
+
+void HandleSigint(int signal){
+	exiting = 1;
+}
+
+void HandleSigHup(int signal){
+	reReadConfig = 1;
 }
 
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors){
@@ -155,13 +179,20 @@ int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProc
 	return 0;
 }
 
-void MonitorProcess(ProcessData process){
+int MonitorProcess(ProcessData process){
 	sleep(process.killTime);
 	int killSuccess = Kill(process);
-	if (killSuccess == -1){
-		exit(EXIT_FAILURE);
-	} else {
-		exit(EXIT_SUCCESS);
+}
+
+void RunChild(ProcessData process, int pipe[2]){
+	PipeData data = {0};
+	while (true){	
+		int killed = MonitorProcess(process);
+		if (killed){
+		//need to notify parent when process is killed?
+		}
+		read(pipe[0], data, sizof(PipeData)); //this should block if the pipe was created as blocking
+		process = data.monitoredProcess;
 	}
 }
 
