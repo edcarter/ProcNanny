@@ -51,38 +51,11 @@ int reReadConfig = 0;
 int main(int argc, char *argv[]){
 	signal(SIGINT, HandleSigint);
 	signal(SIGHUP, HandleSighup);
-
 	assert(argc >= 2);
-
 	char* configLocation = argv[1];
-	char* logPath = getenv("PROCNANNYLOGS");
-
-	//Get Running Processes
-	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
-	ProcessData* processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
-	int processesRunning;
-	if (GetRunningProcesses(processes, &processesRunning)){
-		assert(0);
-	}
-
-	//Kill Other ProcNanny Processes
-	for (int i = 0; i < processesRunning; i++){
-		if (IsOtherProcnanny(processes[i])){
-			Kill(processes[i]);
-		}
-	}
-
-	//Read In Config File
-	int numProcessesInConfig;
-	ConfigData*  configProcesses = (ConfigData*)malloc(maxNumberOfProcesses * sizeof(ConfigData));
-	GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
 
 
-	//Check What Processes out of config are actually running
-	int numProcessesToMonitor;
-	ProcessData* processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
-	LogIfProcessNotRunning(processesToMonitor, configProcesses, numProcessesInConfig, numProcessesToMonitor, logPath);
-
+	ProcessData* processesToMonitor = GetProcessesToMonitor(configLocation);
 	MonitorData* monitors = (MonitorData*) calloc(numProcessesToMonitor, sizeof(MonitorData));
 
 
@@ -129,7 +102,12 @@ int main(int argc, char *argv[]){
 	}
 
 	while(!exiting){
-
+		if (reReadConfig){
+			free (processesToMonitor);
+			processesToMonitor = GetProcessesToMonitor(configLocation);
+			reReadConfig--;
+		}
+		wait(5 * 1000); //wait for 5 seconds
 	}
 
 	//Log metadata and exit
@@ -142,12 +120,45 @@ int main(int argc, char *argv[]){
 	free(configProcesses);
 }
 
+ProcessData* GetProcessesToMonitor(char* configLocation){
+	char* logPath = getenv("PROCNANNYLOGS");
+
+	//Get Running Processes
+	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
+	ProcessData* processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
+	int processesRunning;
+	if (GetRunningProcesses(processes, &processesRunning)){
+		assert(0);
+	}
+
+	//Kill Other ProcNanny Processes
+	for (int i = 0; i < processesRunning; i++){
+		if (IsOtherProcnanny(processes[i])){
+			Kill(processes[i]);
+		}
+	}
+
+	//Read In Config File
+	int numProcessesInConfig;
+	ConfigData*  configProcesses = (ConfigData*)malloc(maxNumberOfProcesses * sizeof(ConfigData));
+	GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
+
+
+	//Check What Processes out of config are actually running
+	int numProcessesToMonitor;
+	ProcessData* processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
+	LogIfProcessNotRunning(processesToMonitor, configProcesses, numProcessesInConfig, numProcessesToMonitor, logPath);
+	free(configProcesses);
+	free(processes);
+	return processesToMonitor;
+}
+
 void HandleSigint(int signal){
 	exiting = 1;
 }
 
 void HandleSigHup(int signal){
-	reReadConfig = 1;
+	reReadConfig++;
 }
 
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors){
