@@ -13,13 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+#define _GNU_SOURCE
 
 #include <stdlib.h>
 #include <assert.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
-#include <signal.h> 
+#include <signal.h>
+#include <stdio.h>
+#include <errno.h> 
 #include "processfinder.h"
 #include "config.h"
 #include "logger.h"
@@ -49,42 +53,49 @@ int getpid(void);
 int Kill(ProcessData process);
 int IsOtherProcnanny(ProcessData process);
 int sprintf(char *str, const char *format, ...);
-void MonitorProcess(ProcessData process);
+int MonitorProcess(ProcessData process);
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors);
 int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProcesses, int numConfigProcesses, int numRunningProcesses, char* logLocation);
+ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored);
+ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors);
+int ReadThroughChildren(MonitorData* monitors, int numMonitors);
+void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMonitor, MonitorData* monitors, int* numMonitors);
+int GetIndexOfReadyMonitor(MonitorData* monitors, int numMonitors);
+ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors);
+void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]);
+void HandleSigint(int signal);
+void HandleSigHup(int signal);
 
 int exiting = 0;
 int reReadConfig = 1;
 ProcessData* processesToMonitor;
-MonitorData* monitors; 
+MonitorData* monitors;
+char* logPath;
+char* configLocation; 
 
 int main(int argc, char *argv[]){
 	signal(SIGINT, HandleSigint);
-	signal(SIGHUP, HandleSighup);
+	signal(SIGHUP, HandleSigHup);
 	assert(argc >= 2);
-	char* configLocation = argv[1];
-
-
-
-	ProcessData* processesToMonitor = GetProcessesToMonitor(configLocation);
+	configLocation = argv[1];
+	logPath = getenv("PROCNANNYLOGS");
 	MonitorData* monitors = (MonitorData*) calloc(MAX_PROCESSES, sizeof(MonitorData));
 	int numMonitors = 0;
+	int totalKilled = 0;
 
 	//main while loop
 	while(!exiting){
 		if (reReadConfig){
 			free (processesToMonitor);
 			int numProcessesToMonitor = 0;
-			processesToMonitor = GetProcessesToMonitor(configLocation, &numProcessesToMonitor);
-			for (int i = 0; i < numProcessesToMonitor; i++){
-				numMonitors += DelegateMonitorProcess(processesToMonitor[i], monitors, &numMonitors);
-			}
+			processesToMonitor = GetProcessesToMonitor(configLocation, &numProcessesToMonitor, monitors, numMonitors);
+			DelegateMonitorProcess(processesToMonitor, numProcessesToMonitor, monitors, &numMonitors);
 			reReadConfig--;
 		}
 		int killed = ReadThroughChildren(monitors, numMonitors);
 		totalKilled += killed;
 
-		wait(5 * 1000); //wait for 5 seconds
+		sleep(5); //wait for 5 seconds
 	}
 
 	//Log metadata and exit
@@ -93,67 +104,72 @@ int main(int argc, char *argv[]){
 	FlushLogger(logPath);
 	free(monitors);
 	free(processesToMonitor);
-	free(processes);
-	free(configProcesses);
 }
 
 //Read through child pipes to get any messages from them. Returns number processes killed.
-int ReadThroughChildren(Monitor* monitors, int numMonitors){
+int ReadThroughChildren(MonitorData* monitors, int numMonitors){
 	int numKilled = 0;
 	for (int i = 0; i < numMonitors; i++){
-		PipeData data = {0};
-		int read;
-		read = read(monitors[i].read_pipe[0], (void*) data, sizeof(PipeData));
-		if (read < 0){
-			fprintf(stderr, "error reading message from child\n");
+		PipeData data = {{0}};
+		PipeData* pData = &data;
+		int bytesRead;
+		bytesRead = read(monitors[i].read_pipe[0], (void*) pData, sizeof(PipeData));
+		if (bytesRead < 0){
+			fprintf(stderr, "error reading message from child: %s\n", strerror(errno));
 			assert(0);
-		} if (read > 0){
-			if (read != sizeof(PipeData)){
+		} if (bytesRead > 0){
+			if (bytesRead != sizeof(PipeData)){
 				fprintf(stderr, "error reading from child, only partial data read\n");
 				assert(0);
 			}
-			if (data.type = "KIL"){ //child killed process
-				ReportProcessKilled(configLocation, monitors[i].monitoredProcessData);
-				numkilled++;
+			if (!strcmp(data.type, "KIL")){ //child killed process
+				ReportProcessKilled(configLocation, &(monitors[i].monitoredProcessData));
+				numKilled++;
 			}
-			monitors[i].monitoredProcessData = NULL;
+			memcpy(monitors[i].monitoredProcessData.PID, "0", 1);
 		}
 	}
+	return numKilled;
 }
 
 //Either make a new child to monitor or delegate to empty monitor
 void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMonitor, MonitorData* monitors, int* numMonitors){
+
 	for (int i = 0; i < numProcessesToMonitor; i++){
+		int childPID = 0;
 		int readyMonitorIndex = GetIndexOfReadyMonitor(monitors, *numMonitors);
-		if (readyMonitorIndex){ //process to monitor
-			monitor[i].monitoredProcessData = processToMonitor[i];
-			PipeData data = {0};
-			data.type = "NEW" //memcpy?
+		if (readyMonitorIndex > 0){ //process to monitor
+			monitors[i].monitoredProcessData = processToMonitor[i];
+			PipeData data = {{0}};
+			PipeData* pData = &data;
+			memcpy(data.type,"NEW",4); //memcpy?
 			data.monitoredProcess = processToMonitor[i];
-			write(monitor[i].write_pipe[1], data, sizeof(PipeData));
+			write(monitors[i].write_pipe[1], pData, sizeof(PipeData));
 		} else { //we need to create new monitor
 			int read_pipe[2]; //pipe to read from child
 			int write_pipe[2]; //pipe to write to child
-			if (!pipe2(read_pipe, O_NONBLOCK)){ //make read pipe non-blocking
+			if (pipe2(read_pipe, O_NONBLOCK) < 0){ //make read pipe non-blocking
+				printf("PIPE ERROR: %s", strerror(errno));
 				assert(0);
 			} 
-			if (!pipe2(write_pipe, 0)){ //want write pipe to be blocking
+			if (!pipe2(write_pipe, 0) < 0){ //want write pipe to be blocking
 				assert(0);
+				printf("PIPE ERROR: %s", strerror(errno));
 			}
 			childPID = fork();
 			if (childPID >= 0){
 				if (childPID ==0){ // child process
 					free(monitors);
 					free(processesToMonitor);
-					close(write_pipe[0]); //read and write pipe will be reversed for child
-					close(read_pipe[1]);
+					close(write_pipe[1]); //read and write pipe will be reversed for child
+					close(read_pipe[0]);
 					RunChild(processToMonitor[i], write_pipe ,read_pipe); //this shouldnt return
 				} else { //parent process
 					close(read_pipe[1]);
 					close(write_pipe[0]);
 					monitors[i].monitorPID = childPID;
-					monitors[i].read_pipe = read_pipe;
-					monitors[i].write_pipe = write_pipe;
+					memcpy(monitors[i].read_pipe, read_pipe, 2 * sizeof(int)); //is this overwriting something?
+					memcpy(monitors[i].write_pipe, write_pipe, 2 * sizeof(int));
 					monitors[i].monitoredProcessData = processesToMonitor[i]; //TODO(If processToMonitor is freed this will mess up)
 				}
 			} else {
@@ -169,7 +185,7 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 
 int GetIndexOfReadyMonitor(MonitorData* monitors, int numMonitors){
 	for (int i = 0; i < numMonitors; i++){
-		if (monitor[i].monitoredProcessData == NULL){ //this monitor isn't monitoring anything
+		if (monitors[i].monitoredProcessData.PID[0] == '0'){ //this monitor isn't monitoring anything
 			return i;
 		}
 	}
@@ -178,9 +194,9 @@ int GetIndexOfReadyMonitor(MonitorData* monitors, int numMonitors){
 
 
 
-
-ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses){
-	char* logPath = getenv("PROCNANNYLOGS");
+//Get processes that should be monitored. This will read in the processes in the config,
+//And then check if these processes are running and if they are already being monitored
+ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors){
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
@@ -205,12 +221,19 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses){
 
 	//Check What Processes out of config are actually running
 	int numProcessesToMonitor;
+	//these are processes that are in the config and are running
 	ProcessData* processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
 	LogIfProcessNotRunning(processesToMonitor, configProcesses, numProcessesInConfig, numProcessesToMonitor, logPath);
+
+	//need to check which processes are being monitored already
+	int numNotMonitored;
+	ProcessData* processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
 	free(configProcesses);
 	free(processes);
-	*numProcesses = numProcessesToMonitor;
-	return processesToMonitor;
+	free(processesToMonitor);
+	//*numProcesses = numProcessesToMonitor;
+	*numProcesses = numNotMonitored;
+	return processesNotMonitored;
 }
 
 void HandleSigint(int signal){
@@ -253,21 +276,48 @@ int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProc
 int MonitorProcess(ProcessData process){
 	sleep(process.killTime);
 	int killSuccess = Kill(process);
+	return killSuccess;
 }
 
 void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
-	PipeData data = {0};
-	while (true){	
+	printf("running child");
+	PipeData data = {{0}};
+	PipeData* pData = &data;
+	while (1){	
 		int killed = MonitorProcess(process);
+		PipeData outData = {{0}};
+		PipeData* pOutData = &outData;
+
+		outData.monitoredProcess = process;
 		if (killed){
-		//need to notify parent when process is killed?
+			memcpy(outData.type,"KIL",4);
+		} else {
+			memcpy(outData.type,"TIM",4);
 		}
-		read(read_pipe[0], data, sizof(PipeData)); //this should block if the pipe was created as blocking
+		write(write_pipe[1], (void*) pOutData, sizeof(PipeData));
+		read(read_pipe[0], (void*) pData, sizeof(PipeData)); //this should block if the pipe was created as blocking
 		process = data.monitoredProcess;
 	}
 	exit(EXIT_SUCCESS);
 }
 
+ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored){
+	int alreadyMonitored = 0;
+	*numNotMonitored = 0;
+	ProcessData* processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData));
+	for (int i = 0; i < numRunningProcesses; i++){
+		for (int j = 0; j < numMonitors; j++){
+			if (!strcmp(runningProcesses[i].PID, monitors[j].monitoredProcessData.PID)){
+				alreadyMonitored = 1;
+			}
+		}
+		if (!alreadyMonitored){
+			processesNotMonitored[*numNotMonitored] = runningProcesses[i];
+			(*numNotMonitored)++; 
+		}
+	}
+	return processesNotMonitored;
+}
 
 int IsOtherProcnanny(ProcessData process){
 	int thisPid = getpid();
