@@ -94,13 +94,11 @@ int main(int argc, char *argv[]){
 		}
 		int killed = ReadThroughChildren(monitors, numMonitors);
 		totalKilled += killed;
-
 		sleep(5); //wait for 5 seconds
 	}
 
 	//Log metadata and exit
 	ReportTotalProcessesKilled(logPath, totalKilled);
-
 	FlushLogger(logPath);
 	free(monitors);
 	free(processesToMonitor);
@@ -123,7 +121,7 @@ int ReadThroughChildren(MonitorData* monitors, int numMonitors){
 				assert(0);
 			}
 			if (!strcmp(data.type, "KIL")){ //child killed process
-				ReportProcessKilled(configLocation, &(monitors[i].monitoredProcessData));
+				ReportProcessKilled(logPath, &(monitors[i].monitoredProcessData));
 				numKilled++;
 			}
 			memcpy(monitors[i].monitoredProcessData.PID, "0", 1);
@@ -283,7 +281,7 @@ int MonitorProcess(ProcessData process){
 void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 	PipeData data = {{0}};
 	PipeData* pData = &data;
-	while (1){
+	while (!exiting){
 		int killedError = MonitorProcess(process);
 		PipeData outData = {{0}};
 		PipeData* pOutData = &outData;
