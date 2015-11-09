@@ -114,7 +114,7 @@ int ReadThroughChildren(MonitorData* monitors, int numMonitors){
 		PipeData* pData = &data;
 		int bytesRead;
 		bytesRead = read(monitors[i].read_pipe[0], (void*) pData, sizeof(PipeData));
-		if (bytesRead < 0){
+		if (bytesRead < 0 && errno != EAGAIN){ //for non blocking read errno is set to EAGAIN when there is nothing to be read
 			fprintf(stderr, "error reading message from child: %s\n", strerror(errno));
 			assert(0);
 		} if (bytesRead > 0){
@@ -159,11 +159,12 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 			childPID = fork();
 			if (childPID >= 0){
 				if (childPID ==0){ // child process
+					ProcessData processData = processToMonitor[i];
 					free(monitors);
 					free(processesToMonitor);
 					close(write_pipe[1]); //read and write pipe will be reversed for child
 					close(read_pipe[0]);
-					RunChild(processToMonitor[i], write_pipe ,read_pipe); //this shouldnt return
+					RunChild(processData, write_pipe ,read_pipe); //this shouldnt return
 				} else { //parent process
 					close(read_pipe[1]);
 					close(write_pipe[0]);
@@ -280,16 +281,15 @@ int MonitorProcess(ProcessData process){
 }
 
 void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
-	printf("running child");
 	PipeData data = {{0}};
 	PipeData* pData = &data;
-	while (1){	
-		int killed = MonitorProcess(process);
+	while (1){
+		int killedError = MonitorProcess(process);
 		PipeData outData = {{0}};
 		PipeData* pOutData = &outData;
 
 		outData.monitoredProcess = process;
-		if (killed){
+		if (!killedError){
 			memcpy(outData.type,"KIL",4);
 		} else {
 			memcpy(outData.type,"TIM",4);
