@@ -28,5 +28,16 @@ int ReportProcessKilled(char* logLocation, ProcessData* processdata);
 //report total number of processes killed on exit
 int ReportTotalProcessesKilled(char* logLocation, int processesKilled);
 
-//flush changes
+void ReportParentPid(FILE* logFile, int parentPid);
+
+int ReportParentPidFile(char* logLocation, int parentPid);
+
+void ReportSighupCaught(FILE* logFile, char* configLocation);
+
+int ReportSighupCaughtFile(char* logLocation, char* configLocation);
+
+void ReportSigintCaught(FILE* location, int processesKilled);
+
+int ReportSigintCaughtFile(char* logLocation, int processesKilled);
+
 int FlushLogger(char* logLocation);

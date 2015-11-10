@@ -75,6 +75,48 @@ int ReportTotalProcessesKilled(char* logLocation, int processesKilled){
 	return fclose(logFile);
 }
 
+//print parent pid
+void ReportParentPid(FILE* logFile, int parentPid){
+	char dateTimeBuffer[256] = {0};
+	GetDateTimeFormat(dateTimeBuffer);
+	strtok(dateTimeBuffer, "\n");
+	fprintf(logFile, "[%s] Info: Parent process is PID %d\n", dateTimeBuffer, parentPid);
+}
+
+int ReportParentPidFile(char* logLocation, int parentPid){
+	FILE* logFile = OpenFile(logLocation);
+	ReportParentPid(logFile, parentPid);
+	return fclose(logFile);
+}
+
+//print sighup caught
+void ReportSighupCaught(FILE* logFile, char* configLocation){
+	char dateTimeBuffer[256] = {0};
+	GetDateTimeFormat(dateTimeBuffer);
+	strtok(dateTimeBuffer, "\n");
+	fprintf(logFile, "[%s] Info: Caught SIGHUP. Configuration file \'%s\' re-read.\n", dateTimeBuffer, configLocation);
+}
+
+int ReportSighupCaughtFile(char* logLocation, char* configLocation){
+	FILE* logFile = OpenFile(logLocation);
+	ReportSighupCaught(logFile, configLocation);
+	return fclose(logFile);
+}
+
+//print sigint caught
+void ReportSigintCaught(FILE* location, int processesKilled){
+	char dateTimeBuffer[256] = {0};
+	GetDateTimeFormat(dateTimeBuffer);
+	strtok(dateTimeBuffer, "\n");
+	fprintf(location, "[%s] Info: Caught SIGINT. Exiting cleanly. %d process(es) killed.\n", dateTimeBuffer, processesKilled);
+}
+
+int ReportSigintCaughtFile(char* logLocation, int processesKilled){
+	FILE* logFile = OpenFile(logLocation);
+	ReportSigintCaught(logFile, processesKilled);
+	return fclose(logFile);
+}
+
 //flush changes
 int FlushLogger(char* logLocation){
 	FILE* logFile = OpenFile(logLocation);

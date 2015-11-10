@@ -49,6 +49,7 @@ typedef struct PipeData {
 } PipeData;
 
 int strcmp(const char *str1, const char *str2);
+void KillOtherProcnanny();
 int getpid(void);
 int Kill(ProcessData process);
 int IsOtherProcnanny(ProcessData process);
@@ -77,11 +78,15 @@ int main(int argc, char *argv[]){
 	signal(SIGINT, HandleSigint);
 	signal(SIGHUP, HandleSigHup);
 	assert(argc >= 2);
-	configLocation = argv[1];
 	logPath = getenv("PROCNANNYLOGS");
+	ReportParentPidFile(logPath, getpid());
+	ReportParentPid(stdout, getpid());
+	configLocation = argv[1];
 	MonitorData* monitors = (MonitorData*) calloc(MAX_PROCESSES, sizeof(MonitorData));
 	int numMonitors = 0;
 	int totalKilled = 0;
+
+	KillOtherProcnanny();
 
 	//main while loop
 	while(!exiting){
@@ -91,11 +96,17 @@ int main(int argc, char *argv[]){
 			processesToMonitor = GetProcessesToMonitor(configLocation, &numProcessesToMonitor, monitors, numMonitors);
 			DelegateMonitorProcess(processesToMonitor, numProcessesToMonitor, monitors, &numMonitors);
 			reReadConfig--;
+			ReportSighupCaughtFile(logPath, configLocation);
+			ReportSighupCaught(stdout, configLocation);
 		}
 		int killed = ReadThroughChildren(monitors, numMonitors);
 		totalKilled += killed;
 		sleep(5); //wait for 5 seconds
 	}
+	//wait on children to exit
+
+	ReportSigintCaughtFile(logPath, totalKilled);
+	ReportSigintCaught(stdout, totalKilled);
 
 	//Log metadata and exit
 	ReportTotalProcessesKilled(logPath, totalKilled);
@@ -136,7 +147,7 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 	for (int i = 0; i < numProcessesToMonitor; i++){
 		int childPID = 0;
 		int readyMonitorIndex = GetIndexOfReadyMonitor(monitors, *numMonitors);
-		if (readyMonitorIndex > 0){ //process to monitor
+		if (readyMonitorIndex >= 0){ //process to monitor
 			monitors[i].monitoredProcessData = processToMonitor[i];
 			PipeData data = {{0}};
 			PipeData* pData = &data;
@@ -158,14 +169,16 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 			if (childPID >= 0){
 				if (childPID ==0){ // child process
 					ProcessData processData = processToMonitor[i];
+					signal(SIGINT, SIG_DFL);
+					signal(SIGHUP, SIG_DFL);
 					free(monitors);
 					free(processesToMonitor);
 					close(write_pipe[1]); //read and write pipe will be reversed for child
 					close(read_pipe[0]);
 					RunChild(processData, write_pipe ,read_pipe); //this shouldnt return
 				} else { //parent process
-					close(read_pipe[1]);
 					close(write_pipe[0]);
+					close(read_pipe[1]);
 					monitors[i].monitorPID = childPID;
 					memcpy(monitors[i].read_pipe, read_pipe, 2 * sizeof(int)); //is this overwriting something?
 					memcpy(monitors[i].write_pipe, write_pipe, 2 * sizeof(int));
@@ -191,13 +204,7 @@ int GetIndexOfReadyMonitor(MonitorData* monitors, int numMonitors){
 	return -1;
 }
 
-
-
-//Get processes that should be monitored. This will read in the processes in the config,
-//And then check if these processes are running and if they are already being monitored
-ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors){
-
-	//Get Running Processes
+void KillOtherProcnanny(){
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
 	ProcessData* processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
 	int processesRunning;
@@ -211,6 +218,27 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 			Kill(processes[i]);
 		}
 	}
+	free(processes);
+}
+
+//Get processes that should be monitored. This will read in the processes in the config,
+//And then check if these processes are running and if they are already being monitored
+ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors){
+
+	//Get Running Processes
+	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
+	ProcessData* processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
+	int processesRunning;
+	if (GetRunningProcesses(processes, &processesRunning)){
+		assert(0);
+	}
+
+	// //Kill Other ProcNanny Processes
+	// for (int i = 0; i < processesRunning; i++){
+	// 	if (IsOtherProcnanny(processes[i])){
+	// 		Kill(processes[i]);
+	// 	}
+	// }
 
 	//Read In Config File
 	int numProcessesInConfig;
@@ -227,7 +255,7 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 	//need to check which processes are being monitored already
 	int numNotMonitored;
 	ProcessData* processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
-	free(configProcesses);
+	free(configProcesses); //will memwatch find?
 	free(processes);
 	free(processesToMonitor);
 	//*numProcesses = numProcessesToMonitor;
@@ -282,6 +310,7 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 	PipeData data = {{0}};
 	PipeData* pData = &data;
 	while (!exiting){
+		printf("STARTED CHILD\n");
 		int killedError = MonitorProcess(process);
 		PipeData outData = {{0}};
 		PipeData* pOutData = &outData;
@@ -294,6 +323,7 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 		}
 		write(write_pipe[1], (void*) pOutData, sizeof(PipeData));
 		read(read_pipe[0], (void*) pData, sizeof(PipeData)); //this should block if the pipe was created as blocking
+		printf("DONE READING\n");
 		process = data.monitoredProcess;
 	}
 	exit(EXIT_SUCCESS);
@@ -328,50 +358,3 @@ int IsOtherProcnanny(ProcessData process){
 	}
 	return 0;
 }
-
-
-
-
-
-
-
-	// //Fork Child Processes for each monitor
-	// int childPID = 1;
-	// ProcessData processToMonitor;
-	// for (int i = 0; i < numProcessesToMonitor; i++){
-	// 	monitors[i].monitoredProcessData = &processesToMonitor[i];
-	// 	processToMonitor = processesToMonitor[i];
-	// 	childPID = fork();
-	// 	if (childPID >= 0){
-	// 		if (childPID ==0){ // child process
-	// 			free(monitors);
-	// 			free(processesToMonitor);
-	// 			free(processes);
-	// 			free(configProcesses);
-	// 			RunChild();
-	// 		} else { //parent process
-	// 			monitors[i].monitorPID = childPID;
-	// 			ReportMonitoringProcess(logPath, &processToMonitor);
-	// 		}
-	// 	} else {
-	// 		assert(0); //unable to fork
-	// 	}
-	// }
-
-	// //child should never get to this point
-	// assert(childPID); //childPID == 0 if the child is running this code
-
-	// //Wait for mesages from child processes
-	// int totalKilled = 0;
-	// int exitStatus = 0;
-	// int exitedPID = 0;
-	// for (int i = 0; i < numProcessesToMonitor; i++){
-	// 	exitedPID = wait(&exitStatus);
-	// 	if (exitStatus == EXIT_SUCCESS){
-	// 		totalKilled++;
-	// 		ProcessData* monitoredProcess = GetMonitoredProcess(exitedPID, monitors, numProcessesToMonitor);
-	// 		ReportProcessKilled(logPath, monitoredProcess);
-	// 	} else {
-	// 		//do nothing, child did not sucessfully kill process
-	// 	}
-	// }
