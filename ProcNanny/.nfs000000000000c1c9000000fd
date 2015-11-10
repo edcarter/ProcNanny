@@ -1,9 +1,0 @@
-
-============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
-
-Started at Mon Nov  9 15:47:40 2015
-
-Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
-mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
-
-NULL free: <2> procnanny.c(91), NULL pointer free'd

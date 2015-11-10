@@ -69,8 +69,8 @@ void HandleSigHup(int signal);
 
 int exiting = 0;
 int reReadConfig = 1;
-ProcessData* processesToMonitor;
-MonitorData* monitors;
+ProcessData* processesToMonitor = NULL;
+MonitorData* monitors = NULL;
 char* logPath;
 char* configLocation; 
 
@@ -87,13 +87,14 @@ int main(int argc, char *argv[]){
 	int totalKilled = 0;
 
 	KillOtherProcnanny();
-	ConfigData*  configProcesses = (ConfigData*)malloc(MAX_PROCESSES * sizeof(ConfigData));
+	ConfigData*  configProcesses = (ConfigData*)calloc(MAX_PROCESSES, sizeof(ConfigData));
 	int numProcessesInConfig;
 	//main while loop
 	while(!exiting){
 		if (reReadConfig){
 			GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
-			free (processesToMonitor);		
+			free (processesToMonitor);
+			processesToMonitor = NULL;		
 			reReadConfig--;
 			ReportSighupCaughtFile(logPath, configLocation);
 			ReportSighupCaught(stdout, configLocation);
@@ -108,13 +109,13 @@ int main(int argc, char *argv[]){
 
 	//wait on children to exit, this will block if children dont exit
 	//whatever.....
-	for (int i = 0; i < numMonitors; i++){
-		int status = 0;
-		do{
-			wait(&status);
-		} while(!WIFEXITED(status)); //keep waiting until we get a child exited
-		assert(WEXITSTATUS(status) == EXIT_SUCCESS); //make sure the child exited successfully
-	}
+	//for (int i = 0; i < numMonitors; i++){
+	// 	int status = 0;
+	// 	do{
+	// 		wait(&status);
+	// 	} while(!WIFEXITED(status)); //keep waiting until we get a child exited
+	// 	assert(WEXITSTATUS(status) == EXIT_SUCCESS); //make sure the child exited successfully
+	// }
 
 	ReportSigintCaughtFile(logPath, totalKilled);
 	ReportSigintCaught(stdout, totalKilled);
@@ -123,8 +124,11 @@ int main(int argc, char *argv[]){
 	ReportTotalProcessesKilled(logPath, totalKilled);
 	FlushLogger(logPath);
 	free(monitors);
+	monitors = NULL;
 	free(configProcesses);
+	configProcesses = NULL;
 	free(processesToMonitor);
+	processesToMonitor = NULL;
 }
 
 //Read through child pipes to get any messages from them. Returns number processes killed.
@@ -141,7 +145,7 @@ int ReadThroughChildren(MonitorData* monitors, int numMonitors){
 		} if (bytesRead > 0){
 			if (bytesRead != sizeof(PipeData)){
 				fprintf(stderr, "error reading from child, only partial data read\n");
-				assert(0);
+				//assert(0);
 			}
 			if (!strcmp(data.type, "KIL")){ //child killed process
 				ReportProcessKilled(logPath, &(monitors[i].monitoredProcessData));
@@ -184,7 +188,9 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 					signal(SIGINT, SIG_DFL);
 					signal(SIGHUP, SIG_DFL);
 					free(monitors);
+					monitors = NULL;
 					free(processesToMonitor);
+					processesToMonitor = NULL;
 					close(write_pipe[1]); //read and write pipe will be reversed for child
 					close(read_pipe[0]);
 					RunChild(processData, write_pipe ,read_pipe); //this shouldnt return
@@ -231,6 +237,7 @@ void KillOtherProcnanny(){
 		}
 	}
 	free(processes);
+	processes = NULL;
 }
 
 //Get processes that should be monitored. This will read in the processes in the config,
@@ -262,7 +269,9 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 	ProcessData* processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
 	//free(configProcesses); //will memwatch find?
 	free(processes);
+	processes = NULL;
 	free(processesToMonitor);
+	processesToMonitor = NULL;
 	*numProcesses = numNotMonitored;
 	return processesNotMonitored;
 }
@@ -337,8 +346,9 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored){
 	int alreadyMonitored = 0;
 	*numNotMonitored = 0;
-	ProcessData* processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData));
+	ProcessData* processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData));\
 	for (int i = 0; i < numRunningProcesses; i++){
+		alreadyMonitored = 0;
 		for (int j = 0; j < numMonitors; j++){
 			if (!strcmp(runningProcesses[i].PID, monitors[j].monitoredProcessData.PID)){
 				alreadyMonitored = 1;
