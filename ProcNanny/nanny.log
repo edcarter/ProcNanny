@@ -212,3 +212,183 @@
 [Mon Nov  9 18:03:49 2015] Info: No 'test' processes found.
 [Mon Nov  9 18:03:49 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
 [Mon Nov  9 18:04:12 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:11:02 2015] Info: Parent process is PID 32632
+[Mon Nov  9 18:11:02 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:11:02 2015] Info: Initializing monitoring of process 'c.out' (PID 32630).
+[Mon Nov  9 18:11:02 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:11:07 2015] Action: PID 32630 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:11:26 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:11:26 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:11:31 2015] Action: PID 32629 ('b.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:11:43 2015] Info: Caught SIGINT. Exiting cleanly. 2 process(es) killed.
+[Mon Nov  9 18:11:43 2015] Info: Exiting. 2 process(es) killed.
+
+[Mon Nov  9 18:12:16 2015] Info: Parent process is PID 32664
+[Mon Nov  9 18:12:16 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:12:16 2015] Info: Initializing monitoring of process 'b.out' (PID 32661).
+[Mon Nov  9 18:12:16 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:12:21 2015] Action: PID 32661 ('b.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:13:16 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:13:16 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:13:21 2015] Action: PID 32662 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:14:10 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:14:10 2015] Info: Initializing monitoring of process 'b.out' (PID 32692).
+[Mon Nov  9 18:14:10 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:14:15 2015] Action: PID 32693 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:14:20 2015] Action: PID 32692 ('b.out') killed after exceeding 10 seconds.
+[Mon Nov  9 18:14:50 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:14:50 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:14:50 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:14:50 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:15:00 2015] Action: PID 32715 ('b.out') killed after exceeding 10 seconds.
+[Mon Nov  9 18:15:19 2015] Info: Caught SIGINT. Exiting cleanly. 5 process(es) killed.
+[Mon Nov  9 18:15:19 2015] Info: Exiting. 5 process(es) killed.
+
+[Mon Nov  9 18:16:52 2015] Info: Parent process is PID 32738
+[Mon Nov  9 18:16:52 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:16:52 2015] Info: Initializing monitoring of process 'c.out' (PID 32736).
+[Mon Nov  9 18:16:52 2015] Info: Initializing monitoring of process 'b.out' (PID 32735).
+[Mon Nov  9 18:16:52 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:16:57 2015] Action: PID 32736 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:17:02 2015] Action: PID 32735 ('b.out') killed after exceeding 10 seconds.
+[Mon Nov  9 18:17:26 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:17:26 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:17:26 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:17:26 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:17:36 2015] Action: PID 32761 ('b.out') killed after exceeding 10 seconds.
+[Mon Nov  9 18:17:50 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:17:50 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:17:50 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:17:55 2015] Action: PID 300 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:18:07 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:18:07 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:18:12 2015] Action: PID 310 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:18:17 2015] Action: PID 309 ('b.out') killed after exceeding 10 seconds.
+[Mon Nov  9 18:18:26 2015] Info: Caught SIGINT. Exiting cleanly. 6 process(es) killed.
+[Mon Nov  9 18:18:26 2015] Info: Exiting. 6 process(es) killed.
+
+[Mon Nov  9 18:27:38 2015] Info: Parent process is PID 372
+[Mon Nov  9 18:27:38 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:27:38 2015] Info: Initializing monitoring of process 'c.out' (PID 371).
+[Mon Nov  9 18:27:38 2015] Info: Initializing monitoring of process 'b.out' (PID 370).
+[Mon Nov  9 18:27:38 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:27:43 2015] Action: PID 371 ('c.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:27:48 2015] Action: PID 370 ('b.out') killed after exceeding 10 seconds.
+[Mon Nov  9 18:28:06 2015] Info: Caught SIGINT. Exiting cleanly. 2 process(es) killed.
+[Mon Nov  9 18:28:06 2015] Info: Exiting. 2 process(es) killed.
+
+[Mon Nov  9 18:43:29 2015] Info: Parent process is PID 580
+[Mon Nov  9 18:43:29 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:43:29 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:43:29 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:43:29 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:43:42 2015] Info: Initializing monitoring of process 'b.out' (PID 458).
+[Mon Nov  9 18:43:47 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:43:47 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:43:47 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:43:52 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:43:52 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:43:52 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:43:57 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:43:57 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:43:57 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:02 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:02 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:02 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:07 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:07 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:07 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:11 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:44:11 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:11 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:11 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:16 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:16 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:16 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:21 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:21 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:21 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:26 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:26 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:26 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:31 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:31 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:31 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:36 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:36 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:36 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:41 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:41 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:41 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:46 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:46 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:46 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:51 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:44:51 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:44:51 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:44:56 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:45:13 2015] Info: Initializing monitoring of process 'c.out' (PID 659).
+[Mon Nov  9 18:50:38 2015] Info: Parent process is PID 751
+[Mon Nov  9 18:50:38 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:50:38 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:50:38 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:50:38 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:50:38 2015] Info: Initializing monitoring of process 'b.out' (PID 738).
+[Mon Nov  9 18:50:43 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:50:43 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:50:43 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:50:43 2015] Action: PID 738 ('b.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:50:48 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:50:48 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:50:48 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:50:53 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:50:53 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:50:53 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:50:53 2015] Action: PID 764 ('b.out') killed after exceeding 5 seconds.
+[Mon Nov  9 18:50:58 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:50:58 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:50:58 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:03 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:03 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:51:03 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:08 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:08 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:51:08 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:10 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:51:10 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:10 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:51:10 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:15 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:15 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:51:15 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:20 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:20 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:51:20 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:25 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Mon Nov  9 18:51:25 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:25 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:51:25 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:30 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:30 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:35 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:35 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:40 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:40 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:45 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:45 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:50 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:50 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:51:55 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:51:55 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:52:00 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:52:00 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:52:05 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:52:05 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:52:10 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:52:10 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:52:15 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:52:15 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:52:20 2015] Info: No 'c.out' processes found.
+[Mon Nov  9 18:52:20 2015] Info: No 'b.out' processes found.
+[Mon Nov  9 18:52:20 2015] Info: No 'test' processes found.
+[Mon Nov  9 18:52:20 2015] Info: Initializing monitoring of process 'b.out' (PID 820).

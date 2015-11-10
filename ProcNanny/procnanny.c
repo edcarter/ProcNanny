@@ -58,7 +58,7 @@ int MonitorProcess(ProcessData process);
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors);
 int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProcesses, int numConfigProcesses, int numRunningProcesses, char* logLocation);
 ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored);
-ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors);
+ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors, ConfigData* configProcesses, int numConfigProcesses);
 int ReadThroughChildren(MonitorData* monitors, int numMonitors);
 void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMonitor, MonitorData* monitors, int* numMonitors);
 int GetIndexOfReadyMonitor(MonitorData* monitors, int numMonitors);
@@ -87,23 +87,34 @@ int main(int argc, char *argv[]){
 	int totalKilled = 0;
 
 	KillOtherProcnanny();
-
+	ConfigData*  configProcesses = (ConfigData*)malloc(MAX_PROCESSES * sizeof(ConfigData));
+	int numProcessesInConfig;
 	//main while loop
 	while(!exiting){
 		if (reReadConfig){
-			free (processesToMonitor);
-			int numProcessesToMonitor = 0;
-			processesToMonitor = GetProcessesToMonitor(configLocation, &numProcessesToMonitor, monitors, numMonitors);
-			DelegateMonitorProcess(processesToMonitor, numProcessesToMonitor, monitors, &numMonitors);
+			GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
+			free (processesToMonitor);		
 			reReadConfig--;
 			ReportSighupCaughtFile(logPath, configLocation);
 			ReportSighupCaught(stdout, configLocation);
 		}
+		int numProcessesToMonitor = 0;
+		processesToMonitor = GetProcessesToMonitor(configLocation, &numProcessesToMonitor, monitors, numMonitors, configProcesses, numProcessesInConfig);
+		DelegateMonitorProcess(processesToMonitor, numProcessesToMonitor, monitors, &numMonitors);
 		int killed = ReadThroughChildren(monitors, numMonitors);
 		totalKilled += killed;
 		sleep(5); //wait for 5 seconds
 	}
-	//wait on children to exit
+
+	//wait on children to exit, this will block if children dont exit
+	//whatever.....
+	for (int i = 0; i < numMonitors; i++){
+		int status = 0;
+		do{
+			wait(&status);
+		} while(!WIFEXITED(status)); //keep waiting until we get a child exited
+		assert(WEXITSTATUS(status) == EXIT_SUCCESS); //make sure the child exited successfully
+	}
 
 	ReportSigintCaughtFile(logPath, totalKilled);
 	ReportSigintCaught(stdout, totalKilled);
@@ -112,6 +123,7 @@ int main(int argc, char *argv[]){
 	ReportTotalProcessesKilled(logPath, totalKilled);
 	FlushLogger(logPath);
 	free(monitors);
+	free(configProcesses);
 	free(processesToMonitor);
 }
 
@@ -223,7 +235,7 @@ void KillOtherProcnanny(){
 
 //Get processes that should be monitored. This will read in the processes in the config,
 //And then check if these processes are running and if they are already being monitored
-ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors){
+ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, MonitorData* monitors, int numMonitors, ConfigData* configProcesses, int numConfigProcesses){
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
@@ -233,32 +245,24 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 		assert(0);
 	}
 
-	// //Kill Other ProcNanny Processes
-	// for (int i = 0; i < processesRunning; i++){
-	// 	if (IsOtherProcnanny(processes[i])){
-	// 		Kill(processes[i]);
-	// 	}
-	// }
-
 	//Read In Config File
-	int numProcessesInConfig;
-	ConfigData*  configProcesses = (ConfigData*)malloc(maxNumberOfProcesses * sizeof(ConfigData));
-	GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
+	// int numProcessesInConfig;
+	// ConfigData*  configProcesses = (ConfigData*)malloc(maxNumberOfProcesses * sizeof(ConfigData));
+	// GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
 
 
 	//Check What Processes out of config are actually running
 	int numProcessesToMonitor;
 	//these are processes that are in the config and are running
 	ProcessData* processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
-	LogIfProcessNotRunning(processesToMonitor, configProcesses, numProcessesInConfig, numProcessesToMonitor, logPath);
+	LogIfProcessNotRunning(processesToMonitor, configProcesses, numConfigProcesses, numProcessesToMonitor, logPath);
 
 	//need to check which processes are being monitored already
 	int numNotMonitored;
 	ProcessData* processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
-	free(configProcesses); //will memwatch find?
+	//free(configProcesses); //will memwatch find?
 	free(processes);
 	free(processesToMonitor);
-	//*numProcesses = numProcessesToMonitor;
 	*numProcesses = numNotMonitored;
 	return processesNotMonitored;
 }
@@ -329,6 +333,7 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 	exit(EXIT_SUCCESS);
 }
 
+//TODO(look in here for bug about processes with same name not being monitored)
 ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored){
 	int alreadyMonitored = 0;
 	*numNotMonitored = 0;
