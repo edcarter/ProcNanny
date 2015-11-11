@@ -77,6 +77,7 @@ char* configLocation;
 int totalKilled = 0; 
 ConfigData* configProcesses = NULL;
 ProcessData* processesNotMonitored = NULL;
+ProcessData* processes = NULL;
 
 int main(int argc, char *argv[]){
 	signal(SIGINT, HandleSigint);
@@ -103,24 +104,12 @@ int main(int argc, char *argv[]){
 			ReportSighupCaught(stdout, configLocation);
 		}
 		int numProcessesToMonitor = 0;
+		int killed = ReadThroughChildren(monitors, numMonitors); 
 		processesToMonitor = GetProcessesToMonitor(configLocation, &numProcessesToMonitor, monitors, numMonitors, configProcesses, numProcessesInConfig);
 		DelegateMonitorProcess(processesToMonitor, numProcessesToMonitor, monitors, &numMonitors);
-		int killed = ReadThroughChildren(monitors, numMonitors);
 		totalKilled += killed;
 		sleep(5); //wait for 5 seconds
 	}
-
-	//wait on children to exit, this will block if children dont exit
-	//whatever.....
-	//for (int i = 0; i < numMonitors; i++){
-	// 	int status = 0;
-	// 	do{
-	// 		wait(&status);
-	// 	} while(!WIFEXITED(status)); //keep waiting until we get a child exited
-	// 	assert(WEXITSTATUS(status) == EXIT_SUCCESS); //make sure the child exited successfully
-	// }
-
-
 }
 
 int Cleanup(){
@@ -138,6 +127,8 @@ int Cleanup(){
 	processesToMonitor = NULL;
 	//free(processesNotMonitored);
 	processesNotMonitored = NULL;
+	free(processes);
+	processes = NULL;
 	exit(EXIT_SUCCESS);
 }
 
@@ -174,12 +165,12 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 		int childPID = 0;
 		int readyMonitorIndex = GetIndexOfReadyMonitor(monitors, *numMonitors);
 		if (readyMonitorIndex >= 0){ //process to monitor
-			monitors[i].monitoredProcessData = processToMonitor[i];
+			monitors[readyMonitorIndex].monitoredProcessData = processToMonitor[i];
 			PipeData data = {{0}};
 			PipeData* pData = &data;
 			memcpy(data.type,"NEW",4); //memcpy?
 			data.monitoredProcess = processToMonitor[i];
-			write(monitors[i].write_pipe[1], pData, sizeof(PipeData));
+			write(monitors[readyMonitorIndex].write_pipe[1], pData, sizeof(PipeData));
 		} else { //we need to create new monitor
 			int read_pipe[2]; //pipe to read from child
 			int write_pipe[2]; //pipe to write to child
@@ -209,10 +200,10 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 				} else { //parent process
 					close(write_pipe[0]);
 					close(read_pipe[1]);
-					monitors[i].monitorPID = childPID;
-					memcpy(monitors[i].read_pipe, read_pipe, 2 * sizeof(int)); //is this overwriting something?
-					memcpy(monitors[i].write_pipe, write_pipe, 2 * sizeof(int));
-					monitors[i].monitoredProcessData = processesToMonitor[i]; //TODO(If processToMonitor is freed this will mess up)
+					monitors[*numMonitors].monitorPID = childPID;
+					memcpy(monitors[*numMonitors].read_pipe, read_pipe, 2 * sizeof(int)); //is this overwriting something?
+					memcpy(monitors[*numMonitors].write_pipe, write_pipe, 2 * sizeof(int));
+					monitors[*numMonitors].monitoredProcessData = processesToMonitor[i]; //TODO(If processToMonitor is freed this will mess up)
 				}
 			} else {
 				assert(0); //unable to fork
@@ -236,7 +227,7 @@ int GetIndexOfReadyMonitor(MonitorData* monitors, int numMonitors){
 
 void KillOtherProcnanny(){
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
-	ProcessData* processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
+	processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
 	int processesRunning;
 	if (GetRunningProcesses(processes, &processesRunning)){
 		assert(0);
@@ -258,7 +249,7 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 
 	//Get Running Processes
 	int maxNumberOfProcesses = GetMaxNumberOfProcesses();
-	ProcessData* processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData));
+	processes = (ProcessData*)calloc(maxNumberOfProcesses, sizeof(ProcessData)); //unfreed
 	int processesRunning;
 	if (GetRunningProcesses(processes, &processesRunning)){
 		assert(0);
@@ -370,7 +361,7 @@ ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunn
 	*numNotMonitored = 0;
 	free(processesNotMonitored);
 	processesNotMonitored = NULL;
-	processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData));\
+	processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData)); //unfreed
 	for (int i = 0; i < numRunningProcesses; i++){
 		alreadyMonitored = 0;
 		for (int j = 0; j < numMonitors; j++){
