@@ -54,7 +54,7 @@ int getpid(void);
 int Kill(ProcessData process);
 int IsOtherProcnanny(ProcessData process);
 int sprintf(char *str, const char *format, ...);
-int MonitorProcess(ProcessData process);
+int MonitorProcess(ProcessData process, int* exiting);
 ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numMonitors);
 int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProcesses, int numConfigProcesses, int numRunningProcesses, char* logLocation);
 ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored);
@@ -66,13 +66,17 @@ ProcessData* GetMonitoredProcess(int monitorPID, MonitorData* monitors, int numM
 void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]);
 void HandleSigint(int signal);
 void HandleSigHup(int signal);
+void HangleSigintChild(int signal);
 
 int exiting = 0;
 int reReadConfig = 1;
 ProcessData* processesToMonitor = NULL;
 MonitorData* monitors = NULL;
 char* logPath;
-char* configLocation; 
+char* configLocation;
+int totalKilled = 0; 
+ConfigData* configProcesses = NULL;
+ProcessData* processesNotMonitored = NULL;
 
 int main(int argc, char *argv[]){
 	signal(SIGINT, HandleSigint);
@@ -82,12 +86,11 @@ int main(int argc, char *argv[]){
 	ReportParentPidFile(logPath, getpid());
 	ReportParentPid(stdout, getpid());
 	configLocation = argv[1];
-	MonitorData* monitors = (MonitorData*) calloc(MAX_PROCESSES, sizeof(MonitorData));
+	monitors = (MonitorData*) calloc(MAX_PROCESSES, sizeof(MonitorData));
 	int numMonitors = 0;
-	int totalKilled = 0;
 
 	KillOtherProcnanny();
-	ConfigData*  configProcesses = (ConfigData*)calloc(MAX_PROCESSES, sizeof(ConfigData));
+	configProcesses = (ConfigData*)calloc(MAX_PROCESSES, sizeof(ConfigData));
 	int numProcessesInConfig;
 	//main while loop
 	while(!exiting){
@@ -117,6 +120,10 @@ int main(int argc, char *argv[]){
 	// 	assert(WEXITSTATUS(status) == EXIT_SUCCESS); //make sure the child exited successfully
 	// }
 
+
+}
+
+int Cleanup(){
 	ReportSigintCaughtFile(logPath, totalKilled);
 	ReportSigintCaught(stdout, totalKilled);
 
@@ -129,6 +136,9 @@ int main(int argc, char *argv[]){
 	configProcesses = NULL;
 	free(processesToMonitor);
 	processesToMonitor = NULL;
+	free(processesNotMonitored);
+	processesNotMonitored = NULL;
+	exit(EXIT_SUCCESS);
 }
 
 //Read through child pipes to get any messages from them. Returns number processes killed.
@@ -185,12 +195,14 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 			if (childPID >= 0){
 				if (childPID ==0){ // child process
 					ProcessData processData = processToMonitor[i];
-					signal(SIGINT, SIG_DFL);
-					signal(SIGHUP, SIG_DFL);
+					signal(SIGINT, HangleSigintChild);
+					//signal(SIGHUP, SIG_DFL);
 					free(monitors);
 					monitors = NULL;
 					free(processesToMonitor);
 					processesToMonitor = NULL;
+					free(configProcesses);
+					configProcesses = NULL;
 					close(write_pipe[1]); //read and write pipe will be reversed for child
 					close(read_pipe[0]);
 					RunChild(processData, write_pipe ,read_pipe); //this shouldnt return
@@ -278,6 +290,11 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 
 void HandleSigint(int signal){
 	exiting = 1;
+	Cleanup();
+}
+
+void HangleSigintChild(int signal){
+	exiting = 1;
 }
 
 void HandleSigHup(int signal){
@@ -313,9 +330,12 @@ int LogIfProcessNotRunning(ProcessData* runningProcesses, ConfigData* configProc
 	return 0;
 }
 
-int MonitorProcess(ProcessData process){
+int MonitorProcess(ProcessData process, int* exiting){
 	sleep(process.killTime);
-	int killSuccess = Kill(process);
+	int killSuccess = 0;
+	if (!*exiting){
+		killSuccess = Kill(process);
+	}
 	return killSuccess;
 }
 
@@ -324,20 +344,22 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 	PipeData* pData = &data;
 	while (!exiting){
 		printf("STARTED CHILD\n");
-		int killedError = MonitorProcess(process);
-		PipeData outData = {{0}};
-		PipeData* pOutData = &outData;
+		int killedError = MonitorProcess(process, &exiting);
+		if (!exiting){
+			PipeData outData = {{0}};
+			PipeData* pOutData = &outData;
 
-		outData.monitoredProcess = process;
-		if (!killedError){
-			memcpy(outData.type,"KIL",4);
-		} else {
-			memcpy(outData.type,"TIM",4);
+			outData.monitoredProcess = process;
+			if (!killedError){
+				memcpy(outData.type,"KIL",4);
+			} else {
+				memcpy(outData.type,"TIM",4);
+			}
+			write(write_pipe[1], (void*) pOutData, sizeof(PipeData));
+			read(read_pipe[0], (void*) pData, sizeof(PipeData)); //this should block if the pipe was created as blocking
+			printf("DONE READING\n");
+			process = data.monitoredProcess;
 		}
-		write(write_pipe[1], (void*) pOutData, sizeof(PipeData));
-		read(read_pipe[0], (void*) pData, sizeof(PipeData)); //this should block if the pipe was created as blocking
-		printf("DONE READING\n");
-		process = data.monitoredProcess;
 	}
 	exit(EXIT_SUCCESS);
 }
@@ -346,7 +368,9 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 ProcessData* GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, MonitorData* monitors, int numMonitors, int* numNotMonitored){
 	int alreadyMonitored = 0;
 	*numNotMonitored = 0;
-	ProcessData* processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData));\
+	free(processesNotMonitored);
+	processesNotMonitored = NULL;
+	processesNotMonitored = (ProcessData*) calloc(MAX_PROCESSES, sizeof(ProcessData));\
 	for (int i = 0; i < numRunningProcesses; i++){
 		alreadyMonitored = 0;
 		for (int j = 0; j < numMonitors; j++){
