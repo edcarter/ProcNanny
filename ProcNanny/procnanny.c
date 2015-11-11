@@ -136,7 +136,7 @@ int Cleanup(){
 	configProcesses = NULL;
 	free(processesToMonitor);
 	processesToMonitor = NULL;
-	free(processesNotMonitored);
+	//free(processesNotMonitored);
 	processesNotMonitored = NULL;
 	exit(EXIT_SUCCESS);
 }
@@ -273,12 +273,12 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 	//Check What Processes out of config are actually running
 	int numProcessesToMonitor;
 	//these are processes that are in the config and are running
-	ProcessData* processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
+	processesToMonitor = GetProcessesToTrack(processes, configProcesses, processesRunning, &numProcessesToMonitor);
 	LogIfProcessNotRunning(processesToMonitor, configProcesses, numConfigProcesses, numProcessesToMonitor, logPath);
 
 	//need to check which processes are being monitored already
 	int numNotMonitored;
-	ProcessData* processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
+	processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
 	//free(configProcesses); //will memwatch find?
 	free(processes);
 	processes = NULL;

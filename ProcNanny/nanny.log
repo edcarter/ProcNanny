@@ -1390,3 +1390,31 @@
 [Tue Nov 10 18:04:41 2015] Info: Caught SIGINT. Exiting cleanly. 2 process(es) killed.
 [Tue Nov 10 18:04:41 2015] Info: Exiting. 2 process(es) killed.
 
+[Tue Nov 10 18:08:26 2015] Info: Parent process is PID 21232
+[Tue Nov 10 18:08:26 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Tue Nov 10 18:08:26 2015] Info: No 'c.out' processes found.
+[Tue Nov 10 18:08:26 2015] Info: No 'test' processes found.
+[Tue Nov 10 18:08:26 2015] Info: Initializing monitoring of process 'b.out' (PID 21139).
+[Tue Nov 10 18:08:26 2015] Info: Initializing monitoring of process 'b.out' (PID 21142).
+[Tue Nov 10 18:08:31 2015] Info: No 'c.out' processes found.
+[Tue Nov 10 18:08:31 2015] Info: No 'b.out' processes found.
+[Tue Nov 10 18:08:32 2015] Info: No 'test' processes found.
+[Tue Nov 10 18:08:32 2015] Action: PID 21139 ('b.out') killed after exceeding 5 seconds.
+[Tue Nov 10 18:08:32 2015] Action: PID 21142 ('b.out') killed after exceeding 5 seconds.
+[Tue Nov 10 18:08:36 2015] Info: Caught SIGINT. Exiting cleanly. 2 process(es) killed.
+[Tue Nov 10 18:08:36 2015] Info: Exiting. 2 process(es) killed.
+
+[Tue Nov 10 18:11:01 2015] Info: Parent process is PID 21306
+[Tue Nov 10 18:11:01 2015] Info: Caught SIGHUP. Configuration file 'nanny.config' re-read.
+[Tue Nov 10 18:11:01 2015] Info: No 'c.out' processes found.
+[Tue Nov 10 18:11:01 2015] Info: No 'test' processes found.
+[Tue Nov 10 18:11:01 2015] Info: Initializing monitoring of process 'b.out' (PID 21245).
+[Tue Nov 10 18:11:01 2015] Info: Initializing monitoring of process 'b.out' (PID 21246).
+[Tue Nov 10 18:11:06 2015] Info: No 'c.out' processes found.
+[Tue Nov 10 18:11:06 2015] Info: No 'b.out' processes found.
+[Tue Nov 10 18:11:06 2015] Info: No 'test' processes found.
+[Tue Nov 10 18:11:06 2015] Action: PID 21245 ('b.out') killed after exceeding 5 seconds.
+[Tue Nov 10 18:11:06 2015] Action: PID 21246 ('b.out') killed after exceeding 5 seconds.
+[Tue Nov 10 18:11:11 2015] Info: Caught SIGINT. Exiting cleanly. 2 process(es) killed.
+[Tue Nov 10 18:11:11 2015] Info: Exiting. 2 process(es) killed.
+

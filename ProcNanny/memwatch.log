@@ -1,16 +1,15 @@
 
 ============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
 
-Started at Tue Nov 10 18:04:33 2015
+Started at Tue Nov 10 18:11:01 2015
 
 Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
 mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
 
 NULL free: <5> procnanny.c(99), NULL pointer free'd
 NULL free: <8> procnanny.c(371), NULL pointer free'd
-double-free: <21> procnanny.c(139), 0xa519e0 was freed from procnanny.c(285)
 
-Stopped at Tue Nov 10 18:04:41 2015
+Stopped at Tue Nov 10 18:11:11 2015
 
 
 Memory usage statistics (global):
@@ -21,7 +20,7 @@ Memory usage statistics (global):
 
 ============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
 
-Started at Tue Nov 10 18:04:33 2015
+Started at Tue Nov 10 18:11:01 2015
 
 Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
 mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
@@ -29,7 +28,7 @@ mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
 NULL free: <5> procnanny.c(99), NULL pointer free'd
 NULL free: <8> procnanny.c(371), NULL pointer free'd
 
-Stopped at Tue Nov 10 18:04:41 2015
+Stopped at Tue Nov 10 18:11:11 2015
 
 
 Memory usage statistics (global):
@@ -40,7 +39,7 @@ Memory usage statistics (global):
 
 ============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
 
-Started at Tue Nov 10 18:04:33 2015
+Started at Tue Nov 10 18:11:01 2015
 
 Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
 mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
@@ -48,7 +47,7 @@ mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
 NULL free: <5> procnanny.c(99), NULL pointer free'd
 NULL free: <8> procnanny.c(371), NULL pointer free'd
 
-Stopped at Tue Nov 10 18:04:41 2015
+Stopped at Tue Nov 10 18:11:11 2015
 
 
 Memory usage statistics (global):
