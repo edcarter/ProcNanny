@@ -126,7 +126,7 @@ int Cleanup(){
 	free(processesToMonitor);
 	processesToMonitor = NULL;
 	//free(processesNotMonitored);
-	processesNotMonitored = NULL;
+	//processesNotMonitored = NULL;
 	free(processes);
 	processes = NULL;
 	exit(EXIT_SUCCESS);
@@ -194,6 +194,7 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 					processesToMonitor = NULL;
 					free(configProcesses);
 					configProcesses = NULL;
+
 					close(write_pipe[1]); //read and write pipe will be reversed for child
 					close(read_pipe[0]);
 					RunChild(processData, write_pipe ,read_pipe); //this shouldnt return
@@ -210,9 +211,9 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 			}
 			assert(childPID); //child should not reach this point
 
-			ReportMonitoringProcess(logPath, processesToMonitor + i);
 			(*numMonitors)++;
 		}
+		ReportMonitoringProcess(logPath, processesToMonitor + i);
 	}
 }
 
@@ -254,12 +255,6 @@ ProcessData* GetProcessesToMonitor(char* configLocation, int* numProcesses, Moni
 	if (GetRunningProcesses(processes, &processesRunning)){
 		assert(0);
 	}
-
-	//Read In Config File
-	// int numProcessesInConfig;
-	// ConfigData*  configProcesses = (ConfigData*)malloc(maxNumberOfProcesses * sizeof(ConfigData));
-	// GetConfigInfo(configLocation, configProcesses, &numProcessesInConfig);
-
 
 	//Check What Processes out of config are actually running
 	int numProcessesToMonitor;
@@ -334,7 +329,6 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 	PipeData data = {{0}};
 	PipeData* pData = &data;
 	while (!exiting){
-		printf("STARTED CHILD\n");
 		int killedError = MonitorProcess(process, &exiting);
 		if (!exiting){
 			PipeData outData = {{0}};
@@ -348,7 +342,6 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 			}
 			write(write_pipe[1], (void*) pOutData, sizeof(PipeData));
 			read(read_pipe[0], (void*) pData, sizeof(PipeData)); //this should block if the pipe was created as blocking
-			printf("DONE READING\n");
 			process = data.monitoredProcess;
 		}
 	}
