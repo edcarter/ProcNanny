@@ -1,0 +1,286 @@
+/*
+Copyright 2015 Elias Carter
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
+/*
+ * Copyright (c) 2015 Elias Carter, Bob Beck <beck@obtuse.com>
+ * Some changes (related to the port number) by Paul Lu, March 2011.
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define	MY_PORT	6666
+#define MAXCONN 32
+
+/* states used in struct con. */
+#define STATE_UNUSED 0
+#define STATE_READING 1
+#define STATE_WRITING 2
+
+
+/* we use this structure to keep track of each connection to us */
+struct con {
+	int sd; 	/* the socket for this connection */
+	int state; 	/* the state of the connection */
+	struct sockaddr_in sa; /* the sockaddr of the connection */
+	size_t  slen;   /* the sockaddr length of the connection */
+	char *buf;	/* a buffer to store the characters read in */
+	char *bp;	/* where we are in the buffer */
+	size_t bs;	/* total size of the buffer */
+	size_t bl;	/* how much we have left to read/write */
+};
+
+struct con connections[MAXCONN];
+int mainSock; //main socket for accepting connections
+
+void initMasterSock(){
+	struct	sockaddr_in	master;
+
+	mainSock = socket(AF_INET, SOCK_STREAM, 0);
+	if (mainSock < 0) {
+		perror ("procnanny.server: cannot open master socket");
+		exit(EXIT_FAILURE);
+	}
+
+	master.sin_family = AF_INET;
+	master.sin_addr.s_addr = INADDR_ANY;
+	master.sin_port = htons (MY_PORT);
+
+	if (bind (mainSock, (struct sockaddr*) &master, sizeof (master))) {
+		perror ("procnanny.server: cannot bind master socket");
+		exit (EXIT_FAILURE);
+	}
+}
+
+/*
+ * close or initialize a connection - resets a connection to the default,
+ * unused state.
+ */
+void closecon (struct con *cp, int initflag)
+{
+	if (!initflag) {
+		if (cp->sd != -1)
+			close(cp->sd); /* close the socket */
+		free(cp->buf); /* free up our buffer */
+	}
+	memset(cp, 0, sizeof(struct con)); /* zero out the con struct */
+	cp->buf = NULL; /* unnecessary because of memset above, but put here
+			 * to remind you NULL is 0.
+			 */
+	cp->sd = -1;
+}
+
+/*
+ * get a free connection structure, to save a new connection in
+ */
+struct con * get_free_conn()
+{
+	int i;
+	for (i = 0; i < MAXCONN; i++) {
+		if (connections[i].state == STATE_UNUSED)
+			return(&connections[i]);
+	}
+	return(NULL); /* we're all full - indicate this to our caller */
+}
+
+
+int main(int argc, char *argv[]) 
+{
+	int max = -1, omax;
+	struct	sockaddr_in from;
+	struct fd_set *readable = NULL;
+
+	initMasterSock();
+	if (listen (mainSock, MAXCONN) == -1){
+		perror("procnanny.server: listen failed");
+	}
+
+	//init all connection structs
+	for (i = 0; i < MAXCONN; i++){
+		closecon(&connections[i], 1);
+	}
+
+	while (1) {
+		int i;
+		int maxfd = -1; /* the biggest value sd we are interested in.*/
+
+			
+			/*
+		 	* first we have to initialize the fd_sets to keep
+		 	* track of readable and writable sockets. we have
+		 	* to make sure we have fd_sets that are big enough
+		 	* to hold our largest valued socket descriptor.
+		 	* so first, we find the max value by iterating through
+		 	* all the connections, and then we allocate fd sets
+		 	* that are big enough, if they aren't already.
+		 	*/
+			omax = max;
+			max = mainSock; /* the listen socket */
+
+			if (max > omax) {
+			/* we need bigger fd_sets allocated */
+
+			/* free the old ones - does nothing if they are NULL */
+			free(readable);
+			free(writable);
+
+			/*
+			 * this is how to allocate fd_sets for select
+			 */
+			readable = (fd_set *)calloc(howmany(max + 1, NFDBITS),
+			    sizeof(fd_mask));
+			if (readable == NULL)
+				err(1, "procnanny.server: out of memory");
+			writable = (fd_set *)calloc(howmany(max + 1, NFDBITS),
+			    sizeof(fd_mask));
+			if (writable == NULL)
+				err(1, "procnanny.server: out of memory");
+			omax = max;
+			/*
+			 * note that calloc always returns 0'ed memory,
+			 * (unlike malloc) so these sets are all set to 0
+			 * and ready to go
+			 */
+		} else {
+			/*
+			 * our allocated sets are big enough, just make
+			 * sure they are cleared to 0. 
+			 */
+			memset(readable, 0, howmany(max+1, NFDBITS) *
+			    sizeof(fd_mask));
+			memset(writable, 0, howmany(max+1, NFDBITS) *
+			    sizeof(fd_mask));
+		}
+
+		/*
+		 * Now, we decide which sockets we are interested
+		 * in reading and writing, by setting the corresponding
+		 * bit in the readable and writable fd_sets.
+		 */
+
+		/*
+		 * we are always interesting in reading from the
+		 * listening socket. so put it in the read set.
+		 */
+
+		FD_SET(sd, readable);
+		if (maxfd < sd)
+			maxfd = sd;
+
+		/*
+		 * now go through the list of connections, and if we
+		 * are interested in reading from, or writing to, the
+		 * connection's socket, put it in the readable, or
+		 * writable fd_set - in preparation to call select
+		 * to tell us which ones we can read and write to.
+		 */
+		for (i = 0; i<MAXCONN; i++) {
+			if (connections[i].state == STATE_READING) {
+				FD_SET(connections[i].sd, readable);
+				if (maxfd < connections[i].sd)
+					maxfd = connections[i].sd;
+			}
+			if (connections[i].state == STATE_WRITING) {
+				FD_SET(connections[i].sd, writable);
+				if (maxfd < connections[i].sd)
+					maxfd = connections[i].sd;
+			}
+		}
+
+		/*
+		 * finally, we can call select. we have filled in "readable"
+		 * and "writable" with everything we are interested in, and
+		 * when select returns, it will indicate in each fd_set
+		 * which sockets are readable and writable
+		 */
+		i = select(maxfd + 1, readable, writable, NULL,NULL);
+		if (i == -1  && errno != EINTR) //EINTR: signal caught
+			err(1, "select failed");
+		if (i > 0) {
+
+			/* something is readable or writable... */
+
+			/*
+			 * First things first.  check the listen socket.
+			 * If it was readable - we have a new connection
+			 * to accept.
+			 */
+
+			if (FD_ISSET(sd, readable)) {
+				struct con *cp;
+				int newsd;
+				socklen_t slen;
+				struct sockaddr_in sa;
+
+				slen = sizeof(sa);
+				newsd = accept(sd, (struct sockaddr *)&sa,
+				    &slen);
+				if (newsd == -1)
+					err(1, "accept failed");
+
+				cp = get_free_conn();
+				if (cp == NULL) {
+					/*
+					 * we have no connection structures
+					 * so we close connection to our
+					 * client to not leave him hanging
+					 * because we are too busy to
+					 * service his request
+					 */
+					close(newsd);
+				} else {
+					/*
+					 * ok, if this worked, we now have a
+					 * new connection. set him up to be
+					 * READING so we do something with him
+					 */
+					cp->state = STATE_READING;
+					cp->sd = newsd;
+					cp->slen = slen;
+					memcpy(&cp->sa, &sa, sizeof(sa));
+				}
+			}
+			/*
+			 * now, iterate through all of our connections,
+			 * check to see if they are readble or writable,
+			 * and if so, do a read or write accordingly 
+			 */
+			for (i = 0; i<MAXCONN; i++) {
+				if ((connections[i].state == STATE_READING) &&
+				    FD_ISSET(connections[i].sd, readable))
+					//handleread(&connections[i]);
+				if ((connections[i].state == STATE_WRITING) &&
+				    FD_ISSET(connections[i].sd, writable))
+					//handlewrite(&connections[i]);
+			}
+	}
+}
+

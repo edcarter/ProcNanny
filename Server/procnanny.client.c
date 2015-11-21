@@ -22,48 +22,57 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <assert.h>
 
 #define	 MY_PORT  6666
 
-main() 
+//Port number of server is passed as second arg
+int main(int argc,  char *argv[])
 {
 	int	s, number;
+
+	char buf[128];
 
 	struct	sockaddr_in	server;
 
 	struct	hostent		*host;
 
+	assert(argc >= 2);
 	/* Put here the name of the sun on which the server is executed */
-	host = gethostbyname ("uc06");
+	host = gethostbyname (argv[1]);
 
 	if (host == NULL) {
 		perror ("procnanny.client: cannot get host description");
 		exit (1);
 	}
 
+	s = socket (AF_INET, SOCK_STREAM, 0);
+
+	if (s < 0) {
+		perror ("procnanny.client: cannot open socket");
+		exit (1);
+	}
+
+	bzero (&server, sizeof (server));
+	bcopy (host->h_addr, & (server.sin_addr), host->h_length);
+	server.sin_family = host->h_addrtype;
+	server.sin_port = htons (MY_PORT);
+
+	if (connect (s, (struct sockaddr*) & server, sizeof (server))) {
+		perror ("procnanny.client: cannot connect to server");
+		exit (1);
+	}
+
 	while (1) {
-
-		s = socket (AF_INET, SOCK_STREAM, 0);
-
-		if (s < 0) {
-			perror ("procnanny.client: cannot open socket");
-			exit (1);
+		//read (s, &number, sizeof (number));
+		bzero(buf, 128);
+		sprintf(buf, "Hello There! Here is number %d.\n", number);
+		if(write(s, buf, 128) < 128) {
+			perror("procnanny.client: unable to write to server");
 		}
-
-		bzero (&server, sizeof (server));
-		bcopy (host->h_addr, & (server.sin_addr), host->h_length);
-		server.sin_family = host->h_addrtype;
-		server.sin_port = htons (MY_PORT);
-
-		if (connect (s, (struct sockaddr*) & server, sizeof (server))) {
-			perror ("procnanny.client: cannot connect to server");
-			exit (1);
-		}
-
-		read (s, &number, sizeof (number));
-		close (s);
-		fprintf (stderr, "Process %d gets number %d\n", getpid (),
-			ntohl (number));
+		fprintf (stderr, "Sent Number %d\n", number);
 		sleep (5);
 	}
+	close (s);
+
 }
