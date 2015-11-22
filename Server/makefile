@@ -1,16 +1,25 @@
 all: procnanny.server procnanny.client
 
+memwatch.o: memwatch.c memwatch.h
+	gcc -DMEMWATCH -DMW_STDIO -c -g memwatch.c
+
+config.o: config.c config.h
+	gcc -Wall -DMEMWATCH -DMW_STDIO -c -g config.c
+
+logger.o: logger.c logger.h
+	gcc -Wall -DMEMWATCH -DMW_STDIO -c -g logger.c
+
 procnanny.server.o: procnanny.server.c
-	gcc -Wall -c -g -std=c99 procnanny.server.c
+	gcc -Wall -DMEMWATCH -DMW_STDIO -c -g procnanny.server.c
 
 procnanny.client.o: procnanny.client.c
-	gcc -Wall -c -g -std=c9 procnanny.client.c
+	gcc -Wall -DMEMWATCH -DMW_STDIO -c -g procnanny.client.c
 
-procnanny.server: procnanny.server.o
-	gcc -Wall -std=c99 -g procnanny.server.o -o procnanny.server
+procnanny.server: procnanny.server.o config.o logger.o memwatch.o
+	gcc -Wall -DMEMWATCH -DMW_STDIO -g procnanny.server.o config.o logger.o memwatch.o -o procnanny.server
 
-procnanny.client: procnanny.client.o
-	gcc -Wall -std=c99 -g procnanny.client.o -o procnanny.client
+procnanny.client: procnanny.client.o memwatch.o
+	gcc -Wall -DMEMWATCH -DMW_STDIO -g procnanny.client.o memwatch.o -o procnanny.client
 
 clean:
 	rm *o procnanny.server procnanny.client

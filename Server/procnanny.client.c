@@ -23,13 +23,14 @@ limitations under the License.
 #include <stdlib.h>
 #include <strings.h>
 #include <assert.h>
+#include <unistd.h>
 
 #define	 MY_PORT  6666
 
 //Port number of server is passed as second arg
 int main(int argc,  char *argv[])
 {
-	int	s, number;
+	int	s, number = 0;
 
 	char buf[128];
 

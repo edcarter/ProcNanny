@@ -68,6 +68,11 @@ limitations under the License.
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
+
+#include "logger.h"
+#include "config.h"
+#include "memwatch.h"
 
 /* we use this structure to keep track of each connection to us */
 struct con {
@@ -109,6 +114,8 @@ struct con connections[MAXCONN];
 #define STATE_WRITING 2
 
 #define MYPORT 6666
+
+#define MAXCONFIG 128 /*how many entries can be in the config file. */
 
 
 
@@ -280,12 +287,36 @@ int main(int argc,  char *argv[])
 	fd_set *readable = NULL; /* fd_sets for select */
 	int i;
 
-	/*
-	 * first, figure out what port we will listen on - it should
-	 * be our first parameter.
-	 * Paul Lu:  Changed to allow no specification of port number, which
-	 *	allows the OS to pick any available port
-	 */
+	int s_hostname = 128;
+	char hostname[s_hostname];
+	memset(hostname, 0, s_hostname);
+
+	assert(argc >= 2);
+	char* config_location = argv[1];
+
+
+	if (gethostname(hostname, s_hostname) == -1)
+		perror("procnanny.server: unable to get hostname");
+
+	int host_pid = getpid();
+
+	char* serv_info = getenv("PROCNANNYSERVERINFO");
+
+	if (serv_info == NULL)
+		perror("procnanny.server: failure to get env var PROCNANNYSERVERINFO");
+
+	char* nanny_log = getenv("PROCNANNYLOGS");
+
+	if (nanny_log == NULL)
+		perror("procnanny.server: failure to get env var PROCNANNYLOGS");
+
+	ReportServerStarted(stdout, host_pid, hostname, MYPORT);
+	ReportServerStartedFile(nanny_log, host_pid, hostname, MYPORT);
+	ReportServerStartedFile2(serv_info, host_pid, hostname, MYPORT);
+
+	int numConfigs = 0;
+	ConfigData* configs = (ConfigData*) calloc(MAXCONFIG, sizeof(ConfigData));
+	GetConfigInfo(config_location, configs, &numConfigs); /*populate configs from the config file*/
 
 
 	/* now off to the races - let's set up our listening socket */
