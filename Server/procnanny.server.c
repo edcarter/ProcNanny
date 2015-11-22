@@ -59,6 +59,7 @@ limitations under the License.
 #include <sys/wait.h>
 
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <err.h>
 #include <errno.h>
@@ -86,6 +87,22 @@ struct con {
 	size_t bl;	/* how much we have left to read/write */
 };
 
+typedef struct SockData {
+	char header[4];
+	/* Parent to child messages
+	 * CLR: notifies client to clear what processes to monitor
+	 * NEW: notifies client of new process to monitor
+	 * EXT: notify client to exit
+	 */
+
+	/* Child to parent messages
+	 * KIL: notify parent that process was killed
+	 * TIM: notified parent that a process timed out early
+	 */
+
+	ProcessData process;
+} SockData;
+
 /*
  * we will accept a maximum of 256 simultaneous connections to us.
  * While you could make this a dynamically allocated array, and
@@ -105,6 +122,9 @@ struct con {
  */
 #define MAXCONN 256
 struct con connections[MAXCONN];
+
+int exiting = 0; /*has the server been instructed to exit?*/
+int configChanged = 0; /*has the config file been changed?*/
 
 #define BUF_ASIZE 256 /* how much buf will we allocate at a time. */
 
@@ -277,10 +297,54 @@ void handleread(struct con *cp)
 	}
 }
 
+void sendmessage(struct con *cp, SockData* sockData){
+	ssize_t totalsent = 0; /*total bytes sent */
+	ssize_t sent = 0; /* bytes sent in one write*/
+	while (totalsent < sizeof(SockData)) {
+		sent = write(cp->sd, (void*) sockData + totalsent, sizeof(SockData) - totalsent);
+		if (sent <= 0){
+			char errormsg[128];
+			sprintf(errormsg, "error sending message to %s", inet_ntoa(cp->sa.sin_addr));
+			perror(errormsg);
+			closecon(cp, 0);
+		}
+		totalsent += sent;
+	}
+}
+
+/* reset the clients so that they stop monitoring the processes
+ * that were sent before. This is done when a new config file
+ * is read on the server */
+void resetclients() {
+	int i;
+	struct con connection = {0};
+	SockData resetmessage = {{0}};
+	strcpy(resetmessage.header,"CLR");
+	for (i = 0; i < MAXCONN; i++){
+		connection = connections[i]; 
+		if (connection.state != STATE_UNUSED){
+			sendmessage(&connection, &resetmessage);
+		}
+	}
+}
+
+
+
+void HandleSigHup(int signal){
+	configChanged = 1;
+}
+
+void HandleSigint(int signal){
+	exiting = 1;
+}
+
 
 
 int main(int argc,  char *argv[])
 {
+	signal(SIGINT, HandleSigint);
+	signal(SIGHUP, HandleSigHup);
+
 	struct sockaddr_in sockname;
 	int max = -1, omax;	     /* the biggest value sd. for select */
 	int sd;			     /* our listen socket */
@@ -313,6 +377,9 @@ int main(int argc,  char *argv[])
 	ReportServerStarted(stdout, host_pid, hostname, MYPORT);
 	ReportServerStartedFile(nanny_log, host_pid, hostname, MYPORT);
 	ReportServerStartedFile2(serv_info, host_pid, hostname, MYPORT);
+	FlushLogger(nanny_log);
+	FlushLogger(serv_info);
+	fflush(stdout);
 
 	int numConfigs = 0;
 	ConfigData* configs = (ConfigData*) calloc(MAXCONFIG, sizeof(ConfigData));
@@ -347,7 +414,16 @@ int main(int argc,  char *argv[])
 	for (i = 0; i < MAXCONN; i++)
 		closecon(&connections[i], 1);
 
-	for(;;) {
+	while(!exiting) {
+
+		if (configChanged){
+			memset(configs, 0, sizeof(ConfigData) * MAXCONFIG); /* clear configs */
+			GetConfigInfo(config_location, configs, &numConfigs); /* read in new configs */
+			/* need to notify clients of config change (CLR) and send processes to monitor (NEW) */
+			resetclients();
+			configChanged = 0;
+		}
+
 		int i;
 		int maxfd = -1; /* the biggest value sd we are interested in.*/
 
@@ -489,7 +565,11 @@ int main(int argc,  char *argv[])
 				{
 					handleread(&connections[i]);
 				}
-			}
-		}
-	}
-}
+			} /* for */
+		} /* if (i > 0)... i = select() */
+	} /* while(!exiting) */
+
+    /* here we need to notify the clients to close 
+     * and clean up any resources that the server uses */
+	return EXIT_SUCCESS;
+} /* main */

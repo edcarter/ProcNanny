@@ -1,0 +1,296 @@
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Sat Nov 21 18:37:50 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(445), NULL pointer free'd
+NULL free: <4> procnanny.server.c(167), NULL pointer free'd
+NULL free: <5> procnanny.server.c(167), NULL pointer free'd
+NULL free: <6> procnanny.server.c(167), NULL pointer free'd
+NULL free: <7> procnanny.server.c(167), NULL pointer free'd
+NULL free: <8> procnanny.server.c(167), NULL pointer free'd
+NULL free: <9> procnanny.server.c(167), NULL pointer free'd
+NULL free: <10> procnanny.server.c(167), NULL pointer free'd
+NULL free: <11> procnanny.server.c(167), NULL pointer free'd
+NULL free: <12> procnanny.server.c(167), NULL pointer free'd
+NULL free: <13> procnanny.server.c(167), NULL pointer free'd
+NULL free: <14> procnanny.server.c(167), NULL pointer free'd
+NULL free: <15> procnanny.server.c(167), NULL pointer free'd
+NULL free: <16> procnanny.server.c(167), NULL pointer free'd
+NULL free: <17> procnanny.server.c(167), NULL pointer free'd
+NULL free: <18> procnanny.server.c(167), NULL pointer free'd
+NULL free: <19> procnanny.server.c(167), NULL pointer free'd
+NULL free: <20> procnanny.server.c(167), NULL pointer free'd
+NULL free: <21> procnanny.server.c(167), NULL pointer free'd
+NULL free: <22> procnanny.server.c(167), NULL pointer free'd
+NULL free: <23> procnanny.server.c(167), NULL pointer free'd
+NULL free: <24> procnanny.server.c(167), NULL pointer free'd
+NULL free: <25> procnanny.server.c(167), NULL pointer free'd
+NULL free: <26> procnanny.server.c(167), NULL pointer free'd
+NULL free: <27> procnanny.server.c(167), NULL pointer free'd
+NULL free: <28> procnanny.server.c(167), NULL pointer free'd
+NULL free: <29> procnanny.server.c(167), NULL pointer free'd
+NULL free: <30> procnanny.server.c(167), NULL pointer free'd
+NULL free: <31> procnanny.server.c(167), NULL pointer free'd
+NULL free: <32> procnanny.server.c(167), NULL pointer free'd
+NULL free: <33> procnanny.server.c(167), NULL pointer free'd
+NULL free: <34> procnanny.server.c(167), NULL pointer free'd
+NULL free: <35> procnanny.server.c(167), NULL pointer free'd
+NULL free: <36> procnanny.server.c(167), NULL pointer free'd
+NULL free: <37> procnanny.server.c(167), NULL pointer free'd
+NULL free: <38> procnanny.server.c(167), NULL pointer free'd
+NULL free: <39> procnanny.server.c(167), NULL pointer free'd
+NULL free: <40> procnanny.server.c(167), NULL pointer free'd
+NULL free: <41> procnanny.server.c(167), NULL pointer free'd
+NULL free: <42> procnanny.server.c(167), NULL pointer free'd
+NULL free: <43> procnanny.server.c(167), NULL pointer free'd
+NULL free: <44> procnanny.server.c(167), NULL pointer free'd
+NULL free: <45> procnanny.server.c(167), NULL pointer free'd
+NULL free: <46> procnanny.server.c(167), NULL pointer free'd
+NULL free: <47> procnanny.server.c(167), NULL pointer free'd
+NULL free: <48> procnanny.server.c(167), NULL pointer free'd
+NULL free: <49> procnanny.server.c(167), NULL pointer free'd
+NULL free: <50> procnanny.server.c(167), NULL pointer free'd
+NULL free: <51> procnanny.server.c(167), NULL pointer free'd
+NULL free: <52> procnanny.server.c(167), NULL pointer free'd
+NULL free: <53> procnanny.server.c(167), NULL pointer free'd
+NULL free: <54> procnanny.server.c(167), NULL pointer free'd
+NULL free: <55> procnanny.server.c(167), NULL pointer free'd
+NULL free: <56> procnanny.server.c(167), NULL pointer free'd
+NULL free: <57> procnanny.server.c(167), NULL pointer free'd
+NULL free: <58> procnanny.server.c(167), NULL pointer free'd
+NULL free: <59> procnanny.server.c(167), NULL pointer free'd
+NULL free: <60> procnanny.server.c(167), NULL pointer free'd
+NULL free: <61> procnanny.server.c(167), NULL pointer free'd
+NULL free: <62> procnanny.server.c(167), NULL pointer free'd
+NULL free: <63> procnanny.server.c(167), NULL pointer free'd
+NULL free: <64> procnanny.server.c(167), NULL pointer free'd
+NULL free: <65> procnanny.server.c(167), NULL pointer free'd
+NULL free: <66> procnanny.server.c(167), NULL pointer free'd
+NULL free: <67> procnanny.server.c(167), NULL pointer free'd
+NULL free: <68> procnanny.server.c(167), NULL pointer free'd
+NULL free: <69> procnanny.server.c(167), NULL pointer free'd
+NULL free: <70> procnanny.server.c(167), NULL pointer free'd
+NULL free: <71> procnanny.server.c(167), NULL pointer free'd
+NULL free: <72> procnanny.server.c(167), NULL pointer free'd
+NULL free: <73> procnanny.server.c(167), NULL pointer free'd
+NULL free: <74> procnanny.server.c(167), NULL pointer free'd
+NULL free: <75> procnanny.server.c(167), NULL pointer free'd
+NULL free: <76> procnanny.server.c(167), NULL pointer free'd
+NULL free: <77> procnanny.server.c(167), NULL pointer free'd
+NULL free: <78> procnanny.server.c(167), NULL pointer free'd
+NULL free: <79> procnanny.server.c(167), NULL pointer free'd
+NULL free: <80> procnanny.server.c(167), NULL pointer free'd
+NULL free: <81> procnanny.server.c(167), NULL pointer free'd
+NULL free: <82> procnanny.server.c(167), NULL pointer free'd
+NULL free: <83> procnanny.server.c(167), NULL pointer free'd
+NULL free: <84> procnanny.server.c(167), NULL pointer free'd
+NULL free: <85> procnanny.server.c(167), NULL pointer free'd
+NULL free: <86> procnanny.server.c(167), NULL pointer free'd
+NULL free: <87> procnanny.server.c(167), NULL pointer free'd
+NULL free: <88> procnanny.server.c(167), NULL pointer free'd
+NULL free: <89> procnanny.server.c(167), NULL pointer free'd
+NULL free: <90> procnanny.server.c(167), NULL pointer free'd
+NULL free: <91> procnanny.server.c(167), NULL pointer free'd
+NULL free: <92> procnanny.server.c(167), NULL pointer free'd
+NULL free: <93> procnanny.server.c(167), NULL pointer free'd
+NULL free: <94> procnanny.server.c(167), NULL pointer free'd
+NULL free: <95> procnanny.server.c(167), NULL pointer free'd
+NULL free: <96> procnanny.server.c(167), NULL pointer free'd
+NULL free: <97> procnanny.server.c(167), NULL pointer free'd
+NULL free: <98> procnanny.server.c(167), NULL pointer free'd
+NULL free: <99> procnanny.server.c(167), NULL pointer free'd
+NULL free: <100> procnanny.server.c(167), NULL pointer free'd
+NULL free: <101> procnanny.server.c(167), NULL pointer free'd
+NULL free: <102> procnanny.server.c(167), NULL pointer free'd
+NULL free: <103> procnanny.server.c(167), NULL pointer free'd
+NULL free: <104> procnanny.server.c(167), NULL pointer free'd
+NULL free: <105> procnanny.server.c(167), NULL pointer free'd
+NULL free: <106> procnanny.server.c(167), NULL pointer free'd
+NULL free: <107> procnanny.server.c(167), NULL pointer free'd
+NULL free: <108> procnanny.server.c(167), NULL pointer free'd
+NULL free: <109> procnanny.server.c(167), NULL pointer free'd
+NULL free: <110> procnanny.server.c(167), NULL pointer free'd
+NULL free: <111> procnanny.server.c(167), NULL pointer free'd
+NULL free: <112> procnanny.server.c(167), NULL pointer free'd
+NULL free: <113> procnanny.server.c(167), NULL pointer free'd
+NULL free: <114> procnanny.server.c(167), NULL pointer free'd
+NULL free: <115> procnanny.server.c(167), NULL pointer free'd
+NULL free: <116> procnanny.server.c(167), NULL pointer free'd
+NULL free: <117> procnanny.server.c(167), NULL pointer free'd
+NULL free: <118> procnanny.server.c(167), NULL pointer free'd
+NULL free: <119> procnanny.server.c(167), NULL pointer free'd
+NULL free: <120> procnanny.server.c(167), NULL pointer free'd
+NULL free: <121> procnanny.server.c(167), NULL pointer free'd
+NULL free: <122> procnanny.server.c(167), NULL pointer free'd
+NULL free: <123> procnanny.server.c(167), NULL pointer free'd
+NULL free: <124> procnanny.server.c(167), NULL pointer free'd
+NULL free: <125> procnanny.server.c(167), NULL pointer free'd
+NULL free: <126> procnanny.server.c(167), NULL pointer free'd
+NULL free: <127> procnanny.server.c(167), NULL pointer free'd
+NULL free: <128> procnanny.server.c(167), NULL pointer free'd
+NULL free: <129> procnanny.server.c(167), NULL pointer free'd
+NULL free: <130> procnanny.server.c(167), NULL pointer free'd
+NULL free: <131> procnanny.server.c(167), NULL pointer free'd
+NULL free: <132> procnanny.server.c(167), NULL pointer free'd
+NULL free: <133> procnanny.server.c(167), NULL pointer free'd
+NULL free: <134> procnanny.server.c(167), NULL pointer free'd
+NULL free: <135> procnanny.server.c(167), NULL pointer free'd
+NULL free: <136> procnanny.server.c(167), NULL pointer free'd
+NULL free: <137> procnanny.server.c(167), NULL pointer free'd
+NULL free: <138> procnanny.server.c(167), NULL pointer free'd
+NULL free: <139> procnanny.server.c(167), NULL pointer free'd
+NULL free: <140> procnanny.server.c(167), NULL pointer free'd
+NULL free: <141> procnanny.server.c(167), NULL pointer free'd
+NULL free: <142> procnanny.server.c(167), NULL pointer free'd
+NULL free: <143> procnanny.server.c(167), NULL pointer free'd
+NULL free: <144> procnanny.server.c(167), NULL pointer free'd
+NULL free: <145> procnanny.server.c(167), NULL pointer free'd
+NULL free: <146> procnanny.server.c(167), NULL pointer free'd
+NULL free: <147> procnanny.server.c(167), NULL pointer free'd
+NULL free: <148> procnanny.server.c(167), NULL pointer free'd
+NULL free: <149> procnanny.server.c(167), NULL pointer free'd
+NULL free: <150> procnanny.server.c(167), NULL pointer free'd
+NULL free: <151> procnanny.server.c(167), NULL pointer free'd
+NULL free: <152> procnanny.server.c(167), NULL pointer free'd
+NULL free: <153> procnanny.server.c(167), NULL pointer free'd
+NULL free: <154> procnanny.server.c(167), NULL pointer free'd
+NULL free: <155> procnanny.server.c(167), NULL pointer free'd
+NULL free: <156> procnanny.server.c(167), NULL pointer free'd
+NULL free: <157> procnanny.server.c(167), NULL pointer free'd
+NULL free: <158> procnanny.server.c(167), NULL pointer free'd
+NULL free: <159> procnanny.server.c(167), NULL pointer free'd
+NULL free: <160> procnanny.server.c(167), NULL pointer free'd
+NULL free: <161> procnanny.server.c(167), NULL pointer free'd
+NULL free: <162> procnanny.server.c(167), NULL pointer free'd
+NULL free: <163> procnanny.server.c(167), NULL pointer free'd
+NULL free: <164> procnanny.server.c(167), NULL pointer free'd
+NULL free: <165> procnanny.server.c(167), NULL pointer free'd
+NULL free: <166> procnanny.server.c(167), NULL pointer free'd
+NULL free: <167> procnanny.server.c(167), NULL pointer free'd
+NULL free: <168> procnanny.server.c(167), NULL pointer free'd
+NULL free: <169> procnanny.server.c(167), NULL pointer free'd
+NULL free: <170> procnanny.server.c(167), NULL pointer free'd
+NULL free: <171> procnanny.server.c(167), NULL pointer free'd
+NULL free: <172> procnanny.server.c(167), NULL pointer free'd
+NULL free: <173> procnanny.server.c(167), NULL pointer free'd
+NULL free: <174> procnanny.server.c(167), NULL pointer free'd
+NULL free: <175> procnanny.server.c(167), NULL pointer free'd
+NULL free: <176> procnanny.server.c(167), NULL pointer free'd
+NULL free: <177> procnanny.server.c(167), NULL pointer free'd
+NULL free: <178> procnanny.server.c(167), NULL pointer free'd
+NULL free: <179> procnanny.server.c(167), NULL pointer free'd
+NULL free: <180> procnanny.server.c(167), NULL pointer free'd
+NULL free: <181> procnanny.server.c(167), NULL pointer free'd
+NULL free: <182> procnanny.server.c(167), NULL pointer free'd
+NULL free: <183> procnanny.server.c(167), NULL pointer free'd
+NULL free: <184> procnanny.server.c(167), NULL pointer free'd
+NULL free: <185> procnanny.server.c(167), NULL pointer free'd
+NULL free: <186> procnanny.server.c(167), NULL pointer free'd
+NULL free: <187> procnanny.server.c(167), NULL pointer free'd
+NULL free: <188> procnanny.server.c(167), NULL pointer free'd
+NULL free: <189> procnanny.server.c(167), NULL pointer free'd
+NULL free: <190> procnanny.server.c(167), NULL pointer free'd
+NULL free: <191> procnanny.server.c(167), NULL pointer free'd
+NULL free: <192> procnanny.server.c(167), NULL pointer free'd
+NULL free: <193> procnanny.server.c(167), NULL pointer free'd
+NULL free: <194> procnanny.server.c(167), NULL pointer free'd
+NULL free: <195> procnanny.server.c(167), NULL pointer free'd
+NULL free: <196> procnanny.server.c(167), NULL pointer free'd
+NULL free: <197> procnanny.server.c(167), NULL pointer free'd
+NULL free: <198> procnanny.server.c(167), NULL pointer free'd
+NULL free: <199> procnanny.server.c(167), NULL pointer free'd
+NULL free: <200> procnanny.server.c(167), NULL pointer free'd
+NULL free: <201> procnanny.server.c(167), NULL pointer free'd
+NULL free: <202> procnanny.server.c(167), NULL pointer free'd
+NULL free: <203> procnanny.server.c(167), NULL pointer free'd
+NULL free: <204> procnanny.server.c(167), NULL pointer free'd
+NULL free: <205> procnanny.server.c(167), NULL pointer free'd
+NULL free: <206> procnanny.server.c(167), NULL pointer free'd
+NULL free: <207> procnanny.server.c(167), NULL pointer free'd
+NULL free: <208> procnanny.server.c(167), NULL pointer free'd
+NULL free: <209> procnanny.server.c(167), NULL pointer free'd
+NULL free: <210> procnanny.server.c(167), NULL pointer free'd
+NULL free: <211> procnanny.server.c(167), NULL pointer free'd
+NULL free: <212> procnanny.server.c(167), NULL pointer free'd
+NULL free: <213> procnanny.server.c(167), NULL pointer free'd
+NULL free: <214> procnanny.server.c(167), NULL pointer free'd
+NULL free: <215> procnanny.server.c(167), NULL pointer free'd
+NULL free: <216> procnanny.server.c(167), NULL pointer free'd
+NULL free: <217> procnanny.server.c(167), NULL pointer free'd
+NULL free: <218> procnanny.server.c(167), NULL pointer free'd
+NULL free: <219> procnanny.server.c(167), NULL pointer free'd
+NULL free: <220> procnanny.server.c(167), NULL pointer free'd
+NULL free: <221> procnanny.server.c(167), NULL pointer free'd
+NULL free: <222> procnanny.server.c(167), NULL pointer free'd
+NULL free: <223> procnanny.server.c(167), NULL pointer free'd
+NULL free: <224> procnanny.server.c(167), NULL pointer free'd
+NULL free: <225> procnanny.server.c(167), NULL pointer free'd
+NULL free: <226> procnanny.server.c(167), NULL pointer free'd
+NULL free: <227> procnanny.server.c(167), NULL pointer free'd
+NULL free: <228> procnanny.server.c(167), NULL pointer free'd
+NULL free: <229> procnanny.server.c(167), NULL pointer free'd
+NULL free: <230> procnanny.server.c(167), NULL pointer free'd
+NULL free: <231> procnanny.server.c(167), NULL pointer free'd
+NULL free: <232> procnanny.server.c(167), NULL pointer free'd
+NULL free: <233> procnanny.server.c(167), NULL pointer free'd
+NULL free: <234> procnanny.server.c(167), NULL pointer free'd
+NULL free: <235> procnanny.server.c(167), NULL pointer free'd
+NULL free: <236> procnanny.server.c(167), NULL pointer free'd
+NULL free: <237> procnanny.server.c(167), NULL pointer free'd
+NULL free: <238> procnanny.server.c(167), NULL pointer free'd
+NULL free: <239> procnanny.server.c(167), NULL pointer free'd
+NULL free: <240> procnanny.server.c(167), NULL pointer free'd
+NULL free: <241> procnanny.server.c(167), NULL pointer free'd
+NULL free: <242> procnanny.server.c(167), NULL pointer free'd
+NULL free: <243> procnanny.server.c(167), NULL pointer free'd
+NULL free: <244> procnanny.server.c(167), NULL pointer free'd
+NULL free: <245> procnanny.server.c(167), NULL pointer free'd
+NULL free: <246> procnanny.server.c(167), NULL pointer free'd
+NULL free: <247> procnanny.server.c(167), NULL pointer free'd
+NULL free: <248> procnanny.server.c(167), NULL pointer free'd
+NULL free: <249> procnanny.server.c(167), NULL pointer free'd
+NULL free: <250> procnanny.server.c(167), NULL pointer free'd
+NULL free: <251> procnanny.server.c(167), NULL pointer free'd
+NULL free: <252> procnanny.server.c(167), NULL pointer free'd
+NULL free: <253> procnanny.server.c(167), NULL pointer free'd
+NULL free: <254> procnanny.server.c(167), NULL pointer free'd
+NULL free: <255> procnanny.server.c(167), NULL pointer free'd
+NULL free: <256> procnanny.server.c(167), NULL pointer free'd
+NULL free: <257> procnanny.server.c(167), NULL pointer free'd
+NULL free: <258> procnanny.server.c(167), NULL pointer free'd
+NULL free: <259> procnanny.server.c(167), NULL pointer free'd
+
+Stopped at Sat Nov 21 18:41:12 2015
+
+unfreed: <3> procnanny.server.c(451), 8 bytes at 0x1112110  	{10 00 00 00 00 00 00 00 .. .. .. .. .. .. .. .. ........}
+unfreed: <1> procnanny.server.c(380), 33280 bytes at 0x1112af0  	{63 2E 6F 75 74 0A 00 00 00 00 00 00 00 00 00 00 c.out...........}
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 33288
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Sat Nov 21 18:43:29 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(450), NULL pointer free'd
+
+Stopped at Sat Nov 21 18:53:00 2015
+
+unfreed: <3> procnanny.server.c(456), 8 bytes at 0x2292110  	{10 00 00 00 00 00 00 00 .. .. .. .. .. .. .. .. ........}
+unfreed: <1> procnanny.server.c(385), 33280 bytes at 0x2292af0  	{63 2E 6F 75 74 0A 00 00 00 00 00 00 00 00 00 00 c.out...........}
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 33288

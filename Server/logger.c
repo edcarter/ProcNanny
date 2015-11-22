@@ -121,7 +121,7 @@ void ReportServerStarted(FILE* location, int pid, char* hostname, int port){
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
 	strtok(dateTimeBuffer, "\n");
-	fprintf(location, "[%s] procnanny server: PID %d on node %s, port %d", dateTimeBuffer, pid, hostname, port);
+	fprintf(location, "[%s] procnanny server: PID %d on node %s, port %d\n", dateTimeBuffer, pid, hostname, port);
 }
 
 int ReportServerStartedFile(char* logLocation, int pid, char* hostname, int port){
