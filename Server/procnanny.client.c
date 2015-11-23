@@ -27,7 +27,8 @@ limitations under the License.
 #include <string.h>
 #include "processfinder.h"
 
-#define	 MY_PORT  6666
+#define	MY_PORT 6666
+#define MAX_PROCESS 128
 
 typedef struct SockData {
 	char header[4];
@@ -45,21 +46,117 @@ typedef struct SockData {
 	ProcessData process;
 } SockData;
 
+/* returns if there is data in the file to be read */
+int readavail(int fd) {
+	int maxdesc;
+	fd_set read;
+	struct timeval tv = {0};
+
+	maxdesc = getdtablesize();
+	FD_ZERO(&read);
+	FD_SET(fd, &read);
+
+	if (select(maxdesc, &read, NULL, NULL, &tv) < 0)
+		perror("procnanny.client: unable to select");
+
+	return FD_ISSET(fd, &read);
+}
+
+/* gets the message from the socket */
+void getmessage(int s, SockData* message){
+	ssize_t justread;
+	int totalread = 0; /* number of bytes read in loop and in total*/
+
+	memset(message, 0, sizeof(SockData));
+
+	while (totalread < sizeof(SockData)){
+		justread = read(s, (void*) message + totalread, sizeof(SockData) - totalread);
+		if (justread < 0){
+			perror("procnanny.client: unable to read from server");
+			return;
+		} else if (justread == 0) {
+			perror("procnanny.client: unable to read, server closed");
+			return;
+		}
+		totalread += justread;
+	}
+}
+
+ProcessData* GetProcessesToTrack(ProcessData* runningprocesses, ProcessData* serverprocesses, int inputCount, int* outputCount){
+	*outputCount = 0;
+
+	for (int i = 0; i < 128; i++){
+		for (int j = 0; j < inputCount; j++){
+			if (!strcmp(serverprocesses[i].CMD, runningprocesses[j].CMD)){
+				(*outputCount)++;
+			}
+		}
+	}
+
+	ProcessData* processesToTrack = (ProcessData*) calloc(*outputCount, sizeof(ProcessData));
+	ProcessData* walkingProcessesToTrack = processesToTrack;
+
+	for (int i = 0; i < 128; i++){
+		for (int j = 0; j < inputCount; j++){
+			if (!strcmp(serverprocesses[i].CMD, runningprocesses[j].CMD)){
+				*walkingProcessesToTrack = runningprocesses[j];
+				walkingProcessesToTrack->killTime = serverprocesses[i].killTime;
+				walkingProcessesToTrack++;
+			}
+		}
+	}
+
+	return processesToTrack; //make sure to free this
+}
+
+//TODO(start from here)
+ProcessData* GetProcessesToMonitor(MonitorData* monitors, int n_monitors, ProcessData* serverprocesses, 
+									int n_serverprocesses, ProcessData* runningprocesses, int n_runningprocesses){
+
+
+	//Check What Processes out of config are actually running
+	int numProcessesToMonitor;
+	//these are processes that are in the config and are running
+	processesToMonitor = GetProcessesToTrack(runningprocesses, serverprocesses, processesRunning, &numProcessesToMonitor);
+	LogIfProcessNotRunning(processesToMonitor, configProcesses, numConfigProcesses, numProcessesToMonitor, logPath);
+
+	//need to check which processes are being monitored already
+	int numNotMonitored;
+	processesNotMonitored  = GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, monitors, numMonitors, &numNotMonitored);
+	//free(configProcesses); //will memwatch find?
+	/*free(processes);
+	processes = NULL;
+	free(processesToMonitor);
+	processesToMonitor = NULL; */
+	*numProcesses = numNotMonitored;
+	return processesNotMonitored;
+}
+
 //Port number of server is passed as second arg
 int main(int argc,  char *argv[])
 {
-	int	s;
-
-	//char buf[sizeof(SockData) * 2];
+	/* socket to server */
+	int	s, n_serverprocesses = 0, n_runningprocesses = 0, n_monitors = 0;
 
 	struct	sockaddr_in	server;
 
 	struct	hostent		*host;
 
+	/* last message recieved from server */
+	SockData servermessage;
+
+	ProcessData* serverprocesses = (ProcessData*) calloc(MAX_PROCESS, sizeof(ProcessData));
+	ProcessData* runningprocesses = (ProcessData*) calloc(MAX_PROCESS, sizeof(ProcessData));
+	ProcessData* processesToMonitor = (ProcessData*) calloc(MAX_PROCESS, sizeof(ProcessData));
+	MonitorData* monitors = (MonitorData*) calloc(MAX_PROCESSES, sizeof(MonitorData));
+
 	assert(argc >= 2);
-	/* Put here the name of the sun on which the server is executed */
+
+	/* first arg contains server name */
 	host = gethostbyname (argv[1]);
 
+
+	/* stuff to connect to server */
 	if (host == NULL) {
 		perror ("procnanny.client: cannot get host description");
 		exit (1);
@@ -82,11 +179,27 @@ int main(int argc,  char *argv[])
 		exit (1);
 	}
 
+
+
+
+
 	while (1) {
-		//read (s, &number, sizeof (number));
-		//int i;
-		//SockData* sockdata;
-		//bzero(buf, sizeof(SockData) * 2);
+
+		if (readavail(s)) {
+			getmessage(s, &servermessage);
+			/* we need to clear out the server processes */
+			if(strcmp(servermessage.header, "CLR")){
+				memset(serverprocesses, 0, sizeof(ProcessData) * MAX_PROCESS);
+				n_serverprocesses = 0;
+			} else if (strcmp(servermessage.header, "EXT")) { /* we need to exit client */
+
+			} else if (strcmp(servermessage.header, "NEW")) { /* we need to add a new process to monitor */
+				serverprocesses[n_serverprocesses] = servermessage.process;
+				GetRunningProcesses(runningprocesses, n_serverprocesses);
+				processesToMonitor = GetPro
+				n_serverprocesses++;
+			}
+		}
 
 		SockData sockdata = {{0}};
 		ProcessData process = {{0}};
