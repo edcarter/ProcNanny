@@ -130,8 +130,7 @@ int configChanged = 0; /*has the config file been changed?*/
 
 /* states used in struct con. */
 #define STATE_UNUSED 0
-#define STATE_READING 1
-#define STATE_WRITING 2
+#define STATE_ACTIVE 1
 
 #define MYPORT 6666
 
@@ -147,8 +146,17 @@ struct con * get_free_conn()
 {
 	int i;
 	for (i = 0; i < MAXCONN; i++) {
-		if (connections[i].state == STATE_UNUSED)
-			return(&connections[i]);
+		if (connections[i].state == STATE_UNUSED){
+			struct con* cp = &connections[i];
+			cp->state = STATE_ACTIVE;
+			cp->bs = sizeof(SockData); /* size of buffer */
+			cp->buf = calloc(1, cp->bs); /* allocate enough space for 1 message */
+			if (cp->buf == NULL)
+				perror("Unable to allocate memory for connection buffer");
+			cp->bp = cp->buf; /* location in buffer */
+			cp->bl = cp->bs; /* number of bytes to read (size of 1 message) */
+			return(cp);
+		}
 	}
 	return(NULL); /* we're all full - indicate this to our caller */
 }
@@ -212,7 +220,6 @@ void handlewrite(struct con *cp)
 	cp->bl -= i; /* decrease how much we have left to write */
 	if (cp->bl == 0) {
 		/* we wrote it all out, hooray, so go back to reading */
-		cp->state = STATE_READING;
 		cp->bl = cp->bs; /* we can read up to this much */
 		cp->bp = cp->buf;	    /* we'll start at the beginning */
 	}
@@ -223,30 +230,11 @@ void handlewrite(struct con *cp)
  * from. assumes the caller has checked that cp->sd is writeable
  * by using select(). If a newline is seen at the end of what we
  * are reading, change the state of this connection to the writing
- * state.
+ * state. Returns -1 if read in incomplete else the read was complete
  */
-void handleread(struct con *cp)
+int handleread(struct con *cp)
 {
 	ssize_t i;
-
-	/*
-	 * first, let's make sure we have enough room to do a
-	 * decent sized read.
-	 */
-
-	if (cp->bl < 10) {
-		char *tmp;
-		tmp = realloc(cp->buf, (cp->bs + BUF_ASIZE) * sizeof(char));
-		if (tmp == NULL) {
-			/* we're out of memory */
-			closecon(cp, 0);
-			return;
-		}
-		cp->buf = tmp;
-		cp->bs += BUF_ASIZE;
-		cp->bl += BUF_ASIZE;
-		cp->bp = cp->buf + (cp->bs - cp->bl);
-	}
 
 	/*
 	 * assuming before we are called, cp->sd was put into an fd_set
@@ -263,19 +251,19 @@ void handleread(struct con *cp)
 	if (i == 0) {
 		/* 0 byte read means the connection got closed */
 		closecon(cp, 0);
-		return;
+		return -1;
 	}
 	if (i == -1) {
 		if (errno != EAGAIN) {
 			/* read failed */
-			perror("read failed! sd %d\n");
+			perror("read failed!");
 			closecon(cp, 0);
 		}
 		/*
 		 * note if EAGAIN, we just return, and let our caller
 		 * decide to call us again when socket is readable
 		 */
-		return;
+		return -1;
 	}
 	/*
 	 * ok we really got something read. chage where we're
@@ -285,16 +273,15 @@ void handleread(struct con *cp)
 	cp->bl -= i;
 
 	/*
-	 * now check to see if we should change state - i.e. we got
-	 * a newline on the end of the buffer
+	 * now check to see if we should change state - i.e. we have
+	 * 0 bytes left to read
 	 */
-	printf("Got: %s", cp->buf);
-	if (*(cp->bp - 1) == '\n') {
-		printf("Got: %s", cp->buf);
-		cp->state = STATE_WRITING;
-		cp->bl = cp->bp - cp->buf; /* how much will we write */
+	if (cp->bl == 0) {
+		cp->bl = sizeof(SockData); /* bytes to read is size of 1 message */
 		cp->bp = cp->buf;	   /* and we'll start from here */
+		return 1;
 	}
+	return -1;
 }
 
 void sendmessage(struct con *cp, SockData* sockData){
@@ -327,6 +314,59 @@ void resetclients() {
 		}
 	}
 }
+
+/* convert a config to a message telling the client to start
+ * monitoring the process in the config */
+void configtomessage(ConfigData config, SockData * message){
+	strcpy(message->header, "NEW");
+	ProcessData process = {{0}};
+	strcpy(process.CMD, config.CMD);
+	process.killTime = config.killTime;
+	message->process = process;
+}
+
+/* update a client with new processes to be monitored */
+void updateclient(struct con* connection, ConfigData* configs, int numConfigs){
+	int j;
+	SockData message = {{0}};
+	for (j = 0; j < numConfigs; j++){
+		configtomessage(configs[j], &message); /*fill in the message using the config*/
+		sendmessage(connection, &message);
+	}
+}
+
+/* update the clients to monitor new processes
+ * by sending them the processes that were recently 
+ * read in */
+void updateclients(ConfigData* configs, int numConfigs) {
+	int i;
+	struct con connection = {0};
+	for (i = 0; i < MAXCONN; i++){
+		connection = connections[i];
+		if (connection.state != STATE_UNUSED){
+			updateclient(&connection, configs, numConfigs);
+		}
+	}
+}
+
+/* update the clients to monitor new processes
+ * by sending them the processes that were recently 
+ * read in */
+void closeclients() {
+	int i;
+	struct con connection = {0};
+	SockData message = {{0}};
+	for (i = 0; i < MAXCONN; i++){
+		connection = connections[i];
+		if (connection.state != STATE_UNUSED){
+			strcpy(message.header, "EXT");
+			sendmessage(&connection, &message);
+			closecon(&connection, 0);
+		}
+	}
+}
+
+
 
 
 
@@ -421,6 +461,7 @@ int main(int argc,  char *argv[])
 			GetConfigInfo(config_location, configs, &numConfigs); /* read in new configs */
 			/* need to notify clients of config change (CLR) and send processes to monitor (NEW) */
 			resetclients();
+			updateclients(configs, numConfigs);
 			configChanged = 0;
 		}
 
@@ -494,7 +535,7 @@ int main(int argc,  char *argv[])
 		 * to tell us which ones we can read and write to.
 		 */
 		for (i = 0; i<MAXCONN; i++) {
-			if (connections[i].state == STATE_READING) {
+			if (connections[i].state == STATE_ACTIVE) {
 				FD_SET(connections[i].sd, readable);
 				if (maxfd < connections[i].sd)
 					maxfd = connections[i].sd;
@@ -507,7 +548,8 @@ int main(int argc,  char *argv[])
 		 * when select returns, it will indicate in each fd_set
 		 * which sockets are readable and writable
 		 */
-		i = select(maxfd + 1, readable, NULL, NULL, NULL);
+		struct timeval timeout = {0};
+		i = select(maxfd + 1, readable, NULL, NULL, &timeout);
 		if (i == -1  && errno != EINTR)
 			perror("procnanny.server: select failed");
 		if (i > 0) {
@@ -548,10 +590,10 @@ int main(int argc,  char *argv[])
 					 * new connection. set him up to be
 					 * READING so we do something with him
 					 */
-					cp->state = STATE_READING;
 					cp->sd = newsd;
 					cp->slen = slen;
 					memcpy(&cp->sa, &sa, sizeof(sa));
+					updateclient(cp, configs, numConfigs);
 				}
 			}
 			/*
@@ -560,14 +602,20 @@ int main(int argc,  char *argv[])
 			 * and if so, do a read or write accordingly 
 			 */
 			for (i = 0; i<MAXCONN; i++) {
-				if ((connections[i].state == STATE_READING) &&
+				if ((connections[i].state != STATE_UNUSED) &&
 				    FD_ISSET(connections[i].sd, readable))
 				{
-					handleread(&connections[i]);
+					if (handleread(&connections[i]) > 0){
+						SockData* sockdata = (SockData*) connections[i].buf;
+						/* we need to log processes that are killed / timed out */
+						printf("Recieved SockData: with header=[%s] and process=[%s] and killTime=[%d]\n", 
+							sockdata->header, sockdata->process.CMD, sockdata->process.killTime);
+					}
 				}
 			} /* for */
 		} /* if (i > 0)... i = select() */
 	} /* while(!exiting) */
+	closeclients();
 
     /* here we need to notify the clients to close 
      * and clean up any resources that the server uses */

@@ -24,15 +24,33 @@ limitations under the License.
 #include <strings.h>
 #include <assert.h>
 #include <unistd.h>
+#include <string.h>
+#include "processfinder.h"
 
 #define	 MY_PORT  6666
+
+typedef struct SockData {
+	char header[4];
+	/* Parent to child messages
+	 * CLR: notifies client to clear what processes to monitor
+	 * NEW: notifies client of new process to monitor
+	 * EXT: notify client to exit
+	 */
+
+	/* Child to parent messages
+	 * KIL: notify parent that process was killed
+	 * TIM: notified parent that a process timed out early
+	 */
+
+	ProcessData process;
+} SockData;
 
 //Port number of server is passed as second arg
 int main(int argc,  char *argv[])
 {
-	int	s, number = 0;
+	int	s;
 
-	char buf[128];
+	//char buf[sizeof(SockData) * 2];
 
 	struct	sockaddr_in	server;
 
@@ -66,14 +84,37 @@ int main(int argc,  char *argv[])
 
 	while (1) {
 		//read (s, &number, sizeof (number));
-		bzero(buf, 128);
-		sprintf(buf, "Hello There! Here is number %d.\n", number);
-		if(write(s, buf, 128) < 128) {
-			perror("procnanny.client: unable to write to server");
-		}
-		fprintf (stderr, "Sent Number %d\n", number);
-		sleep (5);
+		//int i;
+		//SockData* sockdata;
+		//bzero(buf, sizeof(SockData) * 2);
+
+		SockData sockdata = {{0}};
+		ProcessData process = {{0}};
+		strcpy(process.CMD, "CMD FROM CLIENT\n");
+		strcpy(process.PID, "1234");
+		process.killTime = 10;
+		strcpy(sockdata.header, "KIL");
+		sockdata.process = process;
+		write(s, (void*) &sockdata, sizeof(SockData));
+		sleep(5);
+
+		//sprintf(buf, "Hello There! Here is number %d.\n", number);
+		//if(write(s, buf, 128) < 128) {
+			//perror("procnanny.client: unable to write to server");
+		//}
+		//fprintf (stderr, "Sent Number %d\n", number);
+		//sleep (5);
+		/*i = read(s, buf, sizeof(SockData));
+		if (i < 0)
+			perror("procnanny.client: unable to read from server");
+		if (i != sizeof(SockData))
+			break;
+		sockdata = (SockData*) buf;
+		printf("Recieved SockData: with header=[%s] and process=[%s] and killTime=[%d]\n", 
+			sockdata->header, sockdata->process.CMD, sockdata->process.killTime);
+		*/
+
 	}
 	close (s);
-
+	return EXIT_SUCCESS;
 }
