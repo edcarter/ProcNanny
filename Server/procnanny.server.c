@@ -61,6 +61,7 @@ limitations under the License.
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <netdb.h>
 #include <err.h>
 #include <errno.h>
 #include <limits.h>
@@ -85,6 +86,7 @@ struct con {
 	char *bp;	/* where we are in the buffer */
 	size_t bs;	/* total size of the buffer */
 	size_t bl;	/* how much we have left to read/write */
+	char hostname[128];
 };
 
 typedef struct SockData {
@@ -96,6 +98,8 @@ typedef struct SockData {
 	 */
 
 	/* Child to parent messages
+	 * NOT: process does not exist on client
+	 * MON: client is now monitoring a process
 	 * KIL: notify parent that process was killed
 	 * TIM: notified parent that a process timed out early
 	 */
@@ -250,8 +254,8 @@ int handleread(struct con *cp)
 	i = read(cp->sd, cp->bp, cp->bl);
 	if (i == 0) {
 		/* 0 byte read means the connection got closed */
-		closecon(cp, 0);
-		return -1;
+		//closecon(cp, 0);
+		//return -1;
 	}
 	if (i == -1) {
 		if (errno != EAGAIN) {
@@ -389,7 +393,7 @@ int main(int argc,  char *argv[])
 	int max = -1, omax;	     /* the biggest value sd. for select */
 	int sd;			     /* our listen socket */
 	fd_set *readable = NULL; /* fd_sets for select */
-	int i;
+	int i, numkilled = 0;
 
 	int s_hostname = 128;
 	char hostname[s_hostname];
@@ -592,7 +596,14 @@ int main(int argc,  char *argv[])
 					 */
 					cp->sd = newsd;
 					cp->slen = slen;
+
+					char from[128];
+					memset(from, 0, 128);
 					memcpy(&cp->sa, &sa, sizeof(sa));
+					if (!getnameinfo((struct sockaddr*) &cp->sa, (socklen_t) cp->slen, from, 128, NULL, 0, 0))
+							perror("procnanny.server, unable to resolve client host name");
+					memcpy(cp->hostname, from, 128);
+
 					updateclient(cp, configs, numConfigs);
 				}
 			}
@@ -606,16 +617,54 @@ int main(int argc,  char *argv[])
 				    FD_ISSET(connections[i].sd, readable))
 				{
 					if (handleread(&connections[i]) > 0){
-						SockData* sockdata = (SockData*) connections[i].buf;
+						/*char from[128];
+						memset(from, 0, 128);
+						*/
+						struct con cp = connections[i]; 
+						SockData* sockdata = (SockData*) cp.buf;
+
+						/* get host name from our connection */
+						/*if (!getnameinfo((struct sockaddr*) &cp.sa, (socklen_t) cp.slen, from, 128, NULL, NULL, NULL))
+							perror("procnanny.server, unable to resolve client host name"); */
+
 						/* we need to log processes that are killed / timed out */
-						printf("Recieved SockData: with header=[%s] and process=[%s] and killTime=[%d]\n", 
+						printf("Recieved SockData from %s: with header=[%s] and process=[%s] and killTime=[%d]\n", cp.hostname,
 							sockdata->header, sockdata->process.CMD, sockdata->process.killTime);
+
+						if (!strcmp(sockdata->header, "NOT")) {
+							//process does not exist on client
+							ReportProcessNotRunning(nanny_log, &sockdata->process, cp.hostname);
+						} else if (!strcmp(sockdata->header, "MON")) {
+							//process is being monitored
+							ReportMonitoringProcess(nanny_log, &sockdata->process, cp.hostname);
+						} else if (!strcmp(sockdata->header, "KIL")) {
+							//process was killed
+							ReportProcessKilled(nanny_log, &sockdata->process, cp.hostname);
+							numkilled++;
+						} else if (!strcmp(sockdata->header, "TIM")) {
+							//process timed out early, don't need to log
+						}
 					}
-				}
+
+				} /* if (connection can be read) */
+
 			} /* for */
+
 		} /* if (i > 0)... i = select() */
+
 	} /* while(!exiting) */
+
+	for (i = 0; i < MAXCONN; i++){
+		if (connections[i].state != STATE_UNUSED) {
+
+		}
+	}
+	
+	FlushLogger(nanny_log);
 	closeclients();
+	close(sd);
+
+
 
     /* here we need to notify the clients to close 
      * and clean up any resources that the server uses */

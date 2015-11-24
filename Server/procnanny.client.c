@@ -72,10 +72,11 @@ ProcessData* processestomonitor;
 MonitorData* monitors;
 
 int exiting = 0;
+int s;
 
 void cleanup(int status) {
 	free(serverprocesses);
-	free(runningProcesses);
+	free(runningprocesses);
 	free(processestomonitor);
 	free(monitors);
 
@@ -112,11 +113,24 @@ void getmessage(int s, SockData* message){
 			cleanup(EXIT_FAILURE);
 			return;
 		} else if (justread == 0) {
-			cleanup("procnanny.client: unable to read, server closed");
-			exit(EXIT_FAILURE);
+			perror("procnanny.client: unable to read, server closed");
+			cleanup(EXIT_FAILURE);
 			return;
 		}
 		totalread += justread;
+	}
+}
+
+void sendmessage(int s, SockData* message) {
+	ssize_t justwrote;
+	int totalwrote = 0;
+	while (totalwrote < sizeof(SockData)){
+		justwrote = write(s, (void*) message, sizeof(SockData) - totalwrote);
+		if (justwrote < 0) {
+			perror("procnanny.client: unable to send message to server");
+			cleanup(EXIT_FAILURE);
+		}
+		totalwrote += justwrote;
 	}
 }
 
@@ -148,6 +162,20 @@ ProcessData* GetProcessesToTrack(ProcessData* runningprocesses, ProcessData* ser
 	return processesToTrack; //make sure to free this
 }
 
+void ReportProcessKilled(ProcessData processData) {
+	SockData message = {{0}};
+	strcpy(message.header, "KIL");
+	message.process = processData;
+	sendmessage(s, &message);
+}
+
+void ReportProcessTimedOut(ProcessData processData) {
+	SockData message = {{0}};
+	strcpy(message.header, "TIM");
+	message.process = processData;
+	sendmessage(s, &message);
+}
+
 //Read through child pipes to get any messages from them. Returns number processes killed.
 int ReadThroughChildren(MonitorData* monitors, int numMonitors){
 	int i,numKilled = 0;
@@ -166,9 +194,13 @@ int ReadThroughChildren(MonitorData* monitors, int numMonitors){
 			}
 			if (!strcmp(data.type, "KIL")){ //child killed process
 				//TODO(need to report to server process was killed)
-				//ReportProcessKilled(logPath, &(monitors[i].monitoredProcessData));
+				ReportProcessKilled(monitors[i].monitoredProcessData);
 				numKilled++;
+			} else if (!strcmp(data.type, "TIM")){
+				//child timed out
+				ReportProcessTimedOut(monitors[i].monitoredProcessData);
 			}
+
 			memcpy(monitors[i].monitoredProcessData.PID, "0", 1);
 		}
 	}
@@ -215,6 +247,13 @@ void RunChild(ProcessData process, int read_pipe[2], int write_pipe[2]){
 		}
 	}
 	exit(EXIT_SUCCESS);
+}
+
+void ReportMonitoringProcess(ProcessData processData) {
+	SockData message = {{0}};
+	strcpy(message.header, "MON");
+	message.process = processData;
+	sendmessage(s, &message);
 }
 
 //Either make a new child to monitor or delegate to empty monitor
@@ -273,8 +312,32 @@ void DelegateMonitorProcess(ProcessData* processToMonitor, int numProcessesToMon
 			(*numMonitors)++;
 		}
 		/* todo, this needs to go to server */
+		ReportMonitoringProcess(processToMonitor[i]);
 		//ReportMonitoringProcess(logPath, processesToMonitor + i);
 	}
+}
+
+int ReportIfProcessNotRunning(ProcessData* runningProcesses, ProcessData* serverProcesses, int n_runningProcesses, int n_serverProcesses){
+	int i,j,found = 0;
+	for (i = 0; i < n_serverProcesses; i++){
+		char* cmd = serverProcesses[i].CMD;
+		for (j = 0; j < n_runningProcesses; j++){
+			if (!strcmp(cmd, runningProcesses[i].CMD)){
+				found = 1;
+				break;
+			}
+		}
+		if (!found){
+			ProcessData notRunningProcessData = {{0}};
+			strcpy(notRunningProcessData.CMD, cmd);
+			SockData message = {{0}};
+			strcpy(message.header, "NOT");
+			message.process = notRunningProcessData;
+			sendmessage(s, &message);		
+		}
+		found = 0;
+	}
+	return 0;
 }
 
 void GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProcesses, 
@@ -332,7 +395,7 @@ int main(int argc,  char *argv[])
 	monitors = (MonitorData*) calloc(MAX_PROCESS, sizeof(MonitorData));
 
 	/* socket to server */
-	int	s, n_serverprocesses = 0, n_runningprocesses = 0, n_monitors = 0;
+	int	n_serverprocesses = 0, n_runningprocesses = 0, n_monitors = 0;
 
 	struct	sockaddr_in	server;
 
@@ -385,7 +448,7 @@ int main(int argc,  char *argv[])
 				memset(serverprocesses, 0, sizeof(ProcessData) * MAX_PROCESS);
 				n_serverprocesses = 0;
 			} else if (!strcmp(servermessage.header, "EXT")) { /* we need to exit client */
-
+				cleanup(EXIT_SUCCESS);
 			} else if (!strcmp(servermessage.header, "NEW")) { /* we need to add a new process to monitor */
 				serverprocesses[n_serverprocesses] = servermessage.process;
 				n_serverprocesses++;

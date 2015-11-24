@@ -1,18 +1,3 @@
-[Sat Nov 21 17:05:27 2015] procnanny server: PID 17982 on node uc06, port 6666[Sat Nov 21 17:06:02 2015] procnanny server: PID 17996 on node uc06, port 6666[Sat Nov 21 18:37:50 2015] procnanny server: PID 19438 on node uc06, port 6666[Sat Nov 21 18:43:29 2015] procnanny server: PID 19514 on node uc06, port 6666
-[Sun Nov 22 15:54:42 2015] procnanny server: PID 7139 on node uc14, port 6666
-[Sun Nov 22 15:57:17 2015] procnanny server: PID 7169 on node uc14, port 6666
-[Sun Nov 22 15:58:33 2015] procnanny server: PID 7180 on node uc14, port 6666
-[Sun Nov 22 16:17:08 2015] procnanny server: PID 7404 on node uc14, port 6666
-[Sun Nov 22 16:20:31 2015] procnanny server: PID 7465 on node uc14, port 6666
-[Sun Nov 22 16:23:10 2015] procnanny server: PID 7508 on node uc14, port 6666
-[Sun Nov 22 16:26:14 2015] procnanny server: PID 7549 on node uc14, port 6666
-[Sun Nov 22 17:00:20 2015] procnanny server: PID 15375 on node uc05, port 6666
-[Sun Nov 22 17:03:22 2015] procnanny server: PID 15402 on node uc05, port 6666
-[Sun Nov 22 17:30:43 2015] procnanny server: PID 15675 on node uc05, port 6666
-[Sun Nov 22 18:09:10 2015] procnanny server: PID 16091 on node uc05, port 6666
-[Sun Nov 22 18:15:09 2015] procnanny server: PID 16323 on node uc05, port 6666
-[Sun Nov 22 18:17:27 2015] procnanny server: PID 16358 on node uc05, port 6666
-[Tue Nov 24 12:05:59 2015] procnanny server: PID 6972 on node uc05, port 6666
-[Tue Nov 24 13:16:18 2015] procnanny server: PID 7797 on node uc05, port 6666
-[Tue Nov 24 13:24:40 2015] procnanny server: PID 7873 on node uc05, port 6666
-[Tue Nov 24 13:32:42 2015] procnanny server: PID 7904 on node uc05, port 6666
+[Tue Nov 24 16:30:06 2015] procnanny server: PID 9577 on node uc05, port 6666
+[Tue Nov 24 16:30:09 2015] Info: Initializing monitoring of process 'c.out' (PID 32464) on node uc04.cs.ualberta.ca.
+[Tue Nov 24 16:30:19 2015] Action: PID 32464 (c.out) on uc04.cs.ualberta.ca killed after exceeding 10 seconds.

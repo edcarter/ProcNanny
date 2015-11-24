@@ -27,7 +27,7 @@ FILE* OpenFile(char* path);
 int GetDateTimeFormat(char* buffer);
 
 //report process from config not running
-int ReportProcessNotRunning(char* logLocation, ProcessData* processdata){
+int ReportProcessNotRunning(char* logLocation, ProcessData* processdata, char* node){
 	FILE* logFile = OpenFile(logLocation);
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
@@ -35,12 +35,12 @@ int ReportProcessNotRunning(char* logLocation, ProcessData* processdata){
 	char processNameBuffer[256] = {0};
 	strcpy(processNameBuffer, processdata->CMD);
 	strtok(processNameBuffer, "\n");
-	fprintf(logFile, "[%s] Info: No \'%s\' processes found.\n", dateTimeBuffer, processNameBuffer);
+	fprintf(logFile, "[%s] Info: No \'%s\' processes found on %s.\n", dateTimeBuffer, processNameBuffer, node);
 	return fclose(logFile);
 }
 
 //print monitoring processes
-int ReportMonitoringProcess(char* logLocation, ProcessData* processdata){
+int ReportMonitoringProcess(char* logLocation, ProcessData* processdata, char* node){
 	FILE* logFile = OpenFile(logLocation);
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
@@ -48,12 +48,12 @@ int ReportMonitoringProcess(char* logLocation, ProcessData* processdata){
 	char processNameBuffer[256] = {0};
 	strcpy(processNameBuffer, processdata->CMD);
 	strtok(processNameBuffer, "\n");
-	fprintf(logFile, "[%s] Info: Initializing monitoring of process \'%s\' (PID %s).\n", dateTimeBuffer, processNameBuffer, processdata->PID);
+	fprintf(logFile, "[%s] Info: Initializing monitoring of process \'%s\' (PID %s) on node %s.\n", dateTimeBuffer, processNameBuffer, processdata->PID, node);
 	return fclose(logFile);
 }
 
 //print process killed
-int ReportProcessKilled(char* logLocation, ProcessData* processdata){
+int ReportProcessKilled(char* logLocation, ProcessData* processdata, char* node){
 	FILE* logFile = OpenFile(logLocation);
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
@@ -61,7 +61,7 @@ int ReportProcessKilled(char* logLocation, ProcessData* processdata){
 	char processNameBuffer[256] = {0};
 	strcpy(processNameBuffer, processdata->CMD);
 	strtok(processNameBuffer, "\n");
-	fprintf(logFile, "[%s] Action: PID %s (\'%s\') killed after exceeding %d seconds.\n", dateTimeBuffer, processdata->PID, processNameBuffer, processdata->killTime);
+	fprintf(logFile, "[%s] Action: PID %s (%s) on %s killed after exceeding %d seconds.\n", dateTimeBuffer, processdata->PID, processNameBuffer, node, processdata->killTime);
 	return fclose(logFile);
 }
 

@@ -17,13 +17,13 @@ limitations under the License.
 #include "processfinder.h"
 
 //report process from config not running
-int ReportProcessNotRunning(char* logLocation, ProcessData* processdata);
+int ReportProcessNotRunning(char* logLocation, ProcessData* processdata, char* node);
 
 //print monitoring processes
-int ReportMonitoringProcess(char* logLocation, ProcessData* processdata);
+int ReportMonitoringProcess(char* logLocation, ProcessData* processdata, char* node);
 
 //print process killed
-int ReportProcessKilled(char* logLocation, ProcessData* processdata);
+int ReportProcessKilled(char* logLocation, ProcessData* processdata, char* node);
 
 //report total number of processes killed on exit
 int ReportTotalProcessesKilled(char* logLocation, int processesKilled);
