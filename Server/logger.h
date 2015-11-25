@@ -26,7 +26,7 @@ int ReportMonitoringProcess(char* logLocation, ProcessData* processdata, char* n
 int ReportProcessKilled(char* logLocation, ProcessData* processdata, char* node);
 
 //report total number of processes killed on exit
-int ReportTotalProcessesKilled(char* logLocation, int processesKilled);
+int ReportTotalProcessesKilled(char* logLocation, int processesKilled, char* nodes);
 
 void ReportParentPid(FILE* logFile, int parentPid);
 
@@ -36,9 +36,9 @@ void ReportSighupCaught(FILE* logFile, char* configLocation);
 
 int ReportSighupCaughtFile(char* logLocation, char* configLocation);
 
-void ReportSigintCaught(FILE* location, int processesKilled);
+void ReportSigintCaught(FILE* location, int processesKilled, char* nodes);
 
-int ReportSigintCaughtFile(char* logLocation, int processesKilled);
+int ReportSigintCaughtFile(char* logLocation, int processesKilled, char* nodes);
 
 void ReportServerStarted(FILE* location, int pid, char* hostname, int port);
 

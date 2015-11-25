@@ -1,3 +1,9 @@
-[Tue Nov 24 16:30:06 2015] procnanny server: PID 9577 on node uc05, port 6666
-[Tue Nov 24 16:30:09 2015] Info: Initializing monitoring of process 'c.out' (PID 32464) on node uc04.cs.ualberta.ca.
-[Tue Nov 24 16:30:19 2015] Action: PID 32464 (c.out) on uc04.cs.ualberta.ca killed after exceeding 10 seconds.
+[Tue Nov 24 18:00:44 2015] procnanny server: PID 10892 on node uc05, port 6666
+[Tue Nov 24 18:01:02 2015] procnanny server: PID 10897 on node uc05, port 6666
+[Tue Nov 24 18:02:31 2015] Info: Exiting. 0 process(es) killed on node(s) uc06.cs.ualberta.ca.
+
+[Tue Nov 24 18:10:58 2015] procnanny server: PID 11100 on node uc05, port 6666
+[Tue Nov 24 18:11:26 2015] Info: No 'b.out' processes found on uc06.cs.ualberta.ca.
+[Tue Nov 24 18:11:31 2015] Info: No 'b.out' processes found on uc06.cs.ualberta.ca.
+[Tue Nov 24 18:11:35 2015] Info: Exiting. 0 process(es) killed on node(s) uc06.cs.ualberta.ca.
+

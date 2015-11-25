@@ -66,12 +66,12 @@ int ReportProcessKilled(char* logLocation, ProcessData* processdata, char* node)
 }
 
 //report total number of processes killed on exit
-int ReportTotalProcessesKilled(char* logLocation, int processesKilled){
+int ReportTotalProcessesKilled(char* logLocation, int processesKilled, char* nodes){
 	FILE* logFile = OpenFile(logLocation);
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
 	strtok(dateTimeBuffer, "\n");
-	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed.\n\n", dateTimeBuffer, processesKilled);
+	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed on node(s) %s\n\n", dateTimeBuffer, processesKilled, nodes);
 	return fclose(logFile);
 }
 
@@ -104,16 +104,16 @@ int ReportSighupCaughtFile(char* logLocation, char* configLocation){
 }
 
 //print sigint caught
-void ReportSigintCaught(FILE* location, int processesKilled){
+void ReportSigintCaught(FILE* location, int processesKilled, char* nodes){
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
 	strtok(dateTimeBuffer, "\n");
-	fprintf(location, "[%s] Info: Caught SIGINT. Exiting cleanly. %d process(es) killed.\n", dateTimeBuffer, processesKilled);
+	fprintf(location, "[%s] Info: Caught SIGINT. Exiting cleanly. %d process(es) killed on %s\n", dateTimeBuffer, processesKilled, nodes);
 }
 
-int ReportSigintCaughtFile(char* logLocation, int processesKilled){
+int ReportSigintCaughtFile(char* logLocation, int processesKilled, char* nodes){
 	FILE* logFile = OpenFile(logLocation);
-	ReportSigintCaught(logFile, processesKilled);
+	ReportSigintCaught(logFile, processesKilled, nodes);
 	return fclose(logFile);
 }
 

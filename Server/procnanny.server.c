@@ -461,6 +461,8 @@ int main(int argc,  char *argv[])
 	while(!exiting) {
 
 		if (configChanged){
+			ReportSighupCaught(stdout, nanny_log);
+			ReportSighupCaughtFile(nanny_log, nanny_log);
 			memset(configs, 0, sizeof(ConfigData) * MAXCONFIG); /* clear configs */
 			GetConfigInfo(config_location, configs, &numConfigs); /* read in new configs */
 			/* need to notify clients of config change (CLR) and send processes to monitor (NEW) */
@@ -654,15 +656,35 @@ int main(int argc,  char *argv[])
 
 	} /* while(!exiting) */
 
+	char nodes[32*128];
+	char* location = nodes;
+
 	for (i = 0; i < MAXCONN; i++){
+		//int num_clients = 0;
 		if (connections[i].state != STATE_UNUSED) {
+			//strcpy(clientnames[num_clients], connections[i].hostname);
+			sprintf(location, "%s,", connections[i].hostname);
+
+			//read until null terminator
+			while (*location != 0)
+				location++;
 
 		}
 	}
+
+	//replace ',' with '.' at the end of the string
+	*(location-1) = 46;
+
+	ReportTotalProcessesKilled(nanny_log, numkilled, nodes);
+
+	ReportSigintCaught(stdout, numkilled, nodes);
+	ReportSigintCaughtFile(serv_info, numkilled, nodes);
 	
 	FlushLogger(nanny_log);
 	closeclients();
 	close(sd);
+	free(readable);
+	free(configs);
 
 
 

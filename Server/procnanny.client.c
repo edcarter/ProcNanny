@@ -27,10 +27,11 @@ limitations under the License.
 #include <strings.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
 #include "processfinder.h"
 #include "killer.h"
 
-#define	MY_PORT 6666
+//#define	MY_PORT 6666
 #define MAX_PROCESS 128
 
 typedef struct SockData {
@@ -42,6 +43,8 @@ typedef struct SockData {
 	 */
 
 	/* Child to parent messages
+	 * NOT: process does not exist on client
+	 * MON: client is now monitoring a process
 	 * KIL: notify parent that process was killed
 	 * TIM: notified parent that a process timed out early
 	 */
@@ -71,7 +74,7 @@ ProcessData* runningprocesses;
 ProcessData* processestomonitor;
 MonitorData* monitors;
 
-int exiting = 0;
+int MY_PORT, exiting = 0;
 int s;
 
 void cleanup(int status) {
@@ -362,6 +365,7 @@ void GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProce
 	}
 }
 
+
 //TODO(start from here)
 ProcessData* GetProcessesToMonitor(MonitorData* monitors, int n_monitors, ProcessData* serverprocesses, 
 									int n_serverprocesses, ProcessData* runningprocesses, int n_runningprocesses, int* n_tomonitor){
@@ -375,7 +379,7 @@ ProcessData* GetProcessesToMonitor(MonitorData* monitors, int n_monitors, Proces
 
 	//LogIfProcessNotRunning(runningprocesses, serverprocesses, 
 							//n_serverprocesses, n_runningprocesses, logPath);
-
+	ReportIfProcessNotRunning(runningprocesses, serverprocesses, n_runningprocesses, n_serverprocesses);
 	//need to check which processes are being monitored already
 	int numNotMonitored;
 	GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, 
@@ -406,10 +410,11 @@ int main(int argc,  char *argv[])
 
 
 
-	assert(argc >= 2);
+	assert(argc >= 3);
 
 	/* first arg contains server name */
 	host = gethostbyname (argv[1]);
+	MY_PORT = atoi(argv[2]);
 
 
 	/* stuff to connect to server */
@@ -438,10 +443,10 @@ int main(int argc,  char *argv[])
 
 
 
-
+	clock_t last = 0 - (CLOCKS_PER_SEC * 5);
 	while (1) {
 
-		if (readavail(s)) {
+		while (readavail(s)) {
 			getmessage(s, &servermessage);
 			/* we need to clear out the server processes */
 			if(!strcmp(servermessage.header, "CLR")){
@@ -452,6 +457,7 @@ int main(int argc,  char *argv[])
 			} else if (!strcmp(servermessage.header, "NEW")) { /* we need to add a new process to monitor */
 				serverprocesses[n_serverprocesses] = servermessage.process;
 				n_serverprocesses++;
+				/*
 				GetRunningProcesses(runningprocesses, &n_runningprocesses);
 				int n_tomonitor = 0;
 				processestomonitor = GetProcessesToMonitor(monitors, n_monitors, serverprocesses, 
@@ -460,38 +466,24 @@ int main(int argc,  char *argv[])
 				for (i = 0; i < n_tomonitor; i++) {
 					//serverprocesses[n_serverprocesses] = processestomonitor[i];
 					DelegateMonitorProcess(processestomonitor, n_tomonitor, monitors, &n_monitors);
-				}
+				}*/
 			}
 		}
 
-		ReadThroughChildren(monitors, n_monitors);
+		/* re check processes every 5 seconds */
+		if ((clock() - last) > (CLOCKS_PER_SEC * 5)) {
+			ReadThroughChildren(monitors, n_monitors);
 
-		/*
-		SockData sockdata = {{0}};
-		ProcessData process = {{0}};
-		strcpy(process.CMD, "CMD FROM CLIENT\n");
-		strcpy(process.PID, "1234");
-		process.killTime = 10;
-		strcpy(sockdata.header, "KIL");
-		sockdata.process = process;
-		write(s, (void*) &sockdata, sizeof(SockData));
-		sleep(5); */
-
-		//sprintf(buf, "Hello There! Here is number %d.\n", number);
-		//if(write(s, buf, 128) < 128) {
-			//perror("procnanny.client: unable to write to server");
-		//}
-		//fprintf (stderr, "Sent Number %d\n", number);
-		//sleep (5);
-		/*i = read(s, buf, sizeof(SockData));
-		if (i < 0)
-			perror("procnanny.client: unable to read from server");
-		if (i != sizeof(SockData))
-			break;
-		sockdata = (SockData*) buf;
-		printf("Recieved SockData: with header=[%s] and process=[%s] and killTime=[%d]\n", 
-			sockdata->header, sockdata->process.CMD, sockdata->process.killTime);
-		*/
+			GetRunningProcesses(runningprocesses, &n_runningprocesses);
+			int n_tomonitor = 0;
+			processestomonitor = GetProcessesToMonitor(monitors, n_monitors, serverprocesses, 
+								n_serverprocesses, runningprocesses, n_runningprocesses, &n_tomonitor);
+			//int i;
+			
+			//serverprocesses[n_serverprocesses] = processestomonitor[i];
+			DelegateMonitorProcess(processestomonitor, n_tomonitor, monitors, &n_monitors);
+			last = clock();
+		}
 
 	}
 	close (s);
