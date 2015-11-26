@@ -1,9 +1,21 @@
-[Tue Nov 24 18:00:44 2015] procnanny server: PID 10892 on node uc05, port 6666
-[Tue Nov 24 18:01:02 2015] procnanny server: PID 10897 on node uc05, port 6666
-[Tue Nov 24 18:02:31 2015] Info: Exiting. 0 process(es) killed on node(s) uc06.cs.ualberta.ca.
+[Thu Nov 26 15:38:11 2015] procnanny server: PID 10636 on node um11, port 6666
+[Thu Nov 26 15:38:28 2015] Info: No 'c.out' processes found on um10.cs.ualberta.ca.
+[Thu Nov 26 15:38:28 2015] Info: No 'test' processes found on um10.cs.ualberta.ca.
+[Thu Nov 26 15:38:28 2015] Info: Initializing monitoring of process 'b.out' (PID 21593) on node um10.cs.ualberta.ca.
+[Thu Nov 26 15:38:38 2015] Action: PID 21593 (b.out) on um10.cs.ualberta.ca killed after exceeding 10 seconds.
+[Thu Nov 26 15:38:46 2015] Info: Exiting. 1 process(es) killed on node(s) um10.cs.ualberta.ca.
+[Thu Nov 26 15:38:46 2015] Info: Caught SIGINT. Exiting cleanly. 1 process(es) killed on um10.cs.ualberta.ca.
 
-[Tue Nov 24 18:10:58 2015] procnanny server: PID 11100 on node uc05, port 6666
-[Tue Nov 24 18:11:26 2015] Info: No 'b.out' processes found on uc06.cs.ualberta.ca.
-[Tue Nov 24 18:11:31 2015] Info: No 'b.out' processes found on uc06.cs.ualberta.ca.
-[Tue Nov 24 18:11:35 2015] Info: Exiting. 0 process(es) killed on node(s) uc06.cs.ualberta.ca.
+[Thu Nov 26 15:42:18 2015] procnanny server: PID 10729 on node um11, port 6666
+[Thu Nov 26 15:42:41 2015] Info: Caught SIGHUP. Configuration file 'nanny.log' re-read.
+[Thu Nov 26 15:42:50 2015] Info: Exiting. 0 process(es) killed on node(s) 
+[Thu Nov 26 15:42:50 2015] Info: Caught SIGINT. Exiting cleanly. 0 process(es) killed on 
+
+[Thu Nov 26 15:44:20 2015] procnanny server: PID 10784 on node um11, port 6666
+[Thu Nov 26 15:44:28 2015] Info: No 'c.out' processes found on um10.cs.ualberta.ca.
+[Thu Nov 26 15:44:28 2015] Info: No 'test' processes found on um10.cs.ualberta.ca.
+[Thu Nov 26 15:44:28 2015] Info: Initializing monitoring of process 'b.out' (PID 21881) on node um10.cs.ualberta.ca.
+[Thu Nov 26 15:44:38 2015] Action: PID 21881 (b.out) on um10.cs.ualberta.ca killed after exceeding 10 seconds.
+[Thu Nov 26 15:44:47 2015] Info: Exiting. 1 process(es) killed on node(s) um10.cs.ualberta.ca.
+[Thu Nov 26 15:44:47 2015] Info: Caught SIGINT. Exiting cleanly. 1 process(es) killed on um10.cs.ualberta.ca.
 

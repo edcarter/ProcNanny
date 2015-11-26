@@ -24,6 +24,7 @@ limitations under the License.
 char* loggingMode = "a";
 
 FILE* OpenFile(char* path);
+FILE* OpenFileOverwrite(char* path);
 int GetDateTimeFormat(char* buffer);
 
 //report process from config not running
@@ -71,7 +72,7 @@ int ReportTotalProcessesKilled(char* logLocation, int processesKilled, char* nod
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
 	strtok(dateTimeBuffer, "\n");
-	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed on node(s) %s\n\n", dateTimeBuffer, processesKilled, nodes);
+	fprintf(logFile, "[%s] Info: Exiting. %d process(es) killed on node(s) %s\n", dateTimeBuffer, processesKilled, nodes);
 	return fclose(logFile);
 }
 
@@ -108,7 +109,7 @@ void ReportSigintCaught(FILE* location, int processesKilled, char* nodes){
 	char dateTimeBuffer[256] = {0};
 	GetDateTimeFormat(dateTimeBuffer);
 	strtok(dateTimeBuffer, "\n");
-	fprintf(location, "[%s] Info: Caught SIGINT. Exiting cleanly. %d process(es) killed on %s\n", dateTimeBuffer, processesKilled, nodes);
+	fprintf(location, "[%s] Info: Caught SIGINT. Exiting cleanly. %d process(es) killed on %s\n\n", dateTimeBuffer, processesKilled, nodes);
 }
 
 int ReportSigintCaughtFile(char* logLocation, int processesKilled, char* nodes){
@@ -135,7 +136,7 @@ void ReportServerStarted2(FILE* location, int pid, char* hostname, int port){
 }
 
 int ReportServerStartedFile2(char* logLocation, int pid, char* hostname, int port){
-	FILE* logFile = OpenFile(logLocation);
+	FILE* logFile = OpenFileOverwrite(logLocation);
 	ReportServerStarted2(logFile, pid, hostname, port);
 	return fclose(logFile);
 }
@@ -170,6 +171,20 @@ FILE* OpenFile(char* path){
 	}
 	return file;
 }
+
+FILE* OpenFileOverwrite(char* path){
+	FILE* file;
+	if (path[0] == 126){ //~ character
+		char absPath[256] = {0};
+		ConvertHomePathToAbsolute(path, absPath);
+		file = fopen(absPath, "w");
+	} else {
+		file = fopen(path, "w");
+	}
+	return file;
+}
+
+
 
 //get datetime string
 int GetDateTimeFormat(char* buffer){

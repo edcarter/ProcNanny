@@ -30,6 +30,7 @@ limitations under the License.
 #include <time.h>
 #include "processfinder.h"
 #include "killer.h"
+#include "memwatch.h"
 
 //#define	MY_PORT 6666
 #define MAX_PROCESS 128
@@ -39,6 +40,7 @@ typedef struct SockData {
 	/* Parent to child messages
 	 * CLR: notifies client to clear what processes to monitor
 	 * NEW: notifies client of new process to monitor
+	 * FIN: notifies client that configs have finished sending
 	 * EXT: notify client to exit
 	 */
 
@@ -325,7 +327,7 @@ int ReportIfProcessNotRunning(ProcessData* runningProcesses, ProcessData* server
 	for (i = 0; i < n_serverProcesses; i++){
 		char* cmd = serverProcesses[i].CMD;
 		for (j = 0; j < n_runningProcesses; j++){
-			if (!strcmp(cmd, runningProcesses[i].CMD)){
+			if (!strcmp(cmd, runningProcesses[j].CMD)){
 				found = 1;
 				break;
 			}
@@ -368,7 +370,7 @@ void GetProcessesNotMonitored(ProcessData* runningProcesses, int numRunningProce
 
 //TODO(start from here)
 ProcessData* GetProcessesToMonitor(MonitorData* monitors, int n_monitors, ProcessData* serverprocesses, 
-									int n_serverprocesses, ProcessData* runningprocesses, int n_runningprocesses, int* n_tomonitor){
+									int n_serverprocesses, ProcessData* runningprocesses, int n_runningprocesses, int* n_tomonitor, int* new_configs){
 
 
 	//Check What Processes out of config are actually running
@@ -379,7 +381,11 @@ ProcessData* GetProcessesToMonitor(MonitorData* monitors, int n_monitors, Proces
 
 	//LogIfProcessNotRunning(runningprocesses, serverprocesses, 
 							//n_serverprocesses, n_runningprocesses, logPath);
-	ReportIfProcessNotRunning(runningprocesses, serverprocesses, n_runningprocesses, n_serverprocesses);
+	if (*new_configs) {
+		ReportIfProcessNotRunning(runningprocesses, serverprocesses, n_runningprocesses, n_serverprocesses);
+		*new_configs = 0;
+	}
+
 	//need to check which processes are being monitored already
 	int numNotMonitored;
 	GetProcessesNotMonitored(processesToMonitor, numProcessesToMonitor, 
@@ -399,7 +405,7 @@ int main(int argc,  char *argv[])
 	monitors = (MonitorData*) calloc(MAX_PROCESS, sizeof(MonitorData));
 
 	/* socket to server */
-	int	n_serverprocesses = 0, n_runningprocesses = 0, n_monitors = 0;
+	int	n_serverprocesses = 0, n_runningprocesses = 0, n_monitors = 0, new_configs = 0;
 
 	struct	sockaddr_in	server;
 
@@ -443,7 +449,7 @@ int main(int argc,  char *argv[])
 
 
 
-	clock_t last = 0 - (CLOCKS_PER_SEC * 5);
+	clock_t last = clock() - (CLOCKS_PER_SEC * 5);
 	while (1) {
 
 		while (readavail(s)) {
@@ -457,16 +463,23 @@ int main(int argc,  char *argv[])
 			} else if (!strcmp(servermessage.header, "NEW")) { /* we need to add a new process to monitor */
 				serverprocesses[n_serverprocesses] = servermessage.process;
 				n_serverprocesses++;
-				/*
-				GetRunningProcesses(runningprocesses, &n_runningprocesses);
-				int n_tomonitor = 0;
-				processestomonitor = GetProcessesToMonitor(monitors, n_monitors, serverprocesses, 
-									n_serverprocesses, runningprocesses, n_runningprocesses, &n_tomonitor);
-				int i;
-				for (i = 0; i < n_tomonitor; i++) {
-					//serverprocesses[n_serverprocesses] = processestomonitor[i];
-					DelegateMonitorProcess(processestomonitor, n_tomonitor, monitors, &n_monitors);
-				}*/
+
+				//read in messages until we get a 'FIN' message 
+				//which signals that the config files are done sending
+				while (1){
+					if (readavail(s)) {
+						getmessage(s, &servermessage);
+						if (!strcmp(servermessage.header, "NEW")) {
+							serverprocesses[n_serverprocesses] = servermessage.process;
+							n_serverprocesses++;
+						} else if (!strcmp(servermessage.header, "FIN")) {
+							new_configs = 1;
+							break;
+						} else {
+							perror("Bad header recieved from server");
+						}
+					}
+				}
 			}
 		}
 
@@ -477,7 +490,7 @@ int main(int argc,  char *argv[])
 			GetRunningProcesses(runningprocesses, &n_runningprocesses);
 			int n_tomonitor = 0;
 			processestomonitor = GetProcessesToMonitor(monitors, n_monitors, serverprocesses, 
-								n_serverprocesses, runningprocesses, n_runningprocesses, &n_tomonitor);
+								n_serverprocesses, runningprocesses, n_runningprocesses, &n_tomonitor, &new_configs);
 			//int i;
 			
 			//serverprocesses[n_serverprocesses] = processestomonitor[i];
@@ -487,5 +500,5 @@ int main(int argc,  char *argv[])
 
 	}
 	close (s);
-	return EXIT_SUCCESS;
+	cleanup(EXIT_SUCCESS);
 }

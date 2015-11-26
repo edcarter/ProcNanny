@@ -341,3 +341,580 @@ Memory usage statistics (global):
  L)argest memory usage      : 33584
  T)otal of all alloc() calls: 33592
  U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:13:16 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 14:14:31 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 19
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 152648
+ U)nfreed bytes totals      : 0
+all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:36:03 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(497), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:36:05 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:37:17 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 14:37:23 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 6
+ L)argest memory usage      : 152064
+ T)otal of all alloc() calls: 152064
+ U)nfreed bytes totals      : 0
+ all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:39:09 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:40:20 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:39:13 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 14:40:20 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 18
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 152648
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:42:10 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:46:42 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:47:20 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:48:19 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:47:27 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 14:48:19 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 15
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 152648
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:49:15 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 14:49:15 2015
+
+unfreed: <4> procnanny.client.c(405), 39936 bytes at 0xe201e0  	{00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................}
+unfreed: <3> procnanny.client.c(404), 37376 bytes at 0xe16f90  	{00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................}
+unfreed: <2> procnanny.client.c(403), 37376 bytes at 0xe0dd40  	{00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................}
+unfreed: <1> procnanny.client.c(402), 37376 bytes at 0xe04af0  	{00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................}
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 152064
+ T)otal of all alloc() calls: 152064
+ U)nfreed bytes totals      : 152064
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:49:37 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:50:03 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:50:36 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:50:39 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:50:50 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:51:10 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 14:57:51 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 14:57:54 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:06:42 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:06:46 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:07:11 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:07:12 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:08:56 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:08:59 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:09:22 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:09:25 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:10:57 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:11:06 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:13:21 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:15:29 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 6
+ L)argest memory usage      : 33880
+ T)otal of all alloc() calls: 33896
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:13:43 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 15:15:29 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 23
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 153232
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:21:39 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:22:17 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:22:56 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:22:58 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:23:58 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:25:48 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:26:28 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:28:17 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:26:46 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 15:28:17 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 21
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 152648
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:28:39 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:28:40 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:29:10 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:29:13 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:30:21 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:36:27 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:38:11 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(504), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:38:46 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 4
+ L)argest memory usage      : 33584
+ T)otal of all alloc() calls: 33592
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:38:23 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 15:38:46 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 9
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 152648
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:42:18 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+NULL free: <2> procnanny.server.c(505), NULL pointer free'd
+
+Stopped at Thu Nov 26 15:42:50 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 2
+ L)argest memory usage      : 33288
+ T)otal of all alloc() calls: 33288
+ U)nfreed bytes totals      : 0
+
+============= MEMWATCH 2.71 Copyright (C) 1992-1999 Johan Lindh =============
+
+Started at Thu Nov 26 15:44:23 2015
+
+Modes: __STDC__ 64-bit mwDWORD==(unsigned int)
+mwROUNDALLOC==8 sizeof(mwData)==56 mwDataSize==56
+
+
+Stopped at Thu Nov 26 15:44:47 2015
+
+
+Memory usage statistics (global):
+ N)umber of allocations made: 9
+ L)argest memory usage      : 152356
+ T)otal of all alloc() calls: 152648
+ U)nfreed bytes totals      : 0
+ all alloc() calls: 33592
+ U)nfreed bytes totals      : 0

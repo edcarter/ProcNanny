@@ -94,6 +94,7 @@ typedef struct SockData {
 	/* Parent to child messages
 	 * CLR: notifies client to clear what processes to monitor
 	 * NEW: notifies client of new process to monitor
+	 * FIN: notifies client that configs have finished sending
 	 * EXT: notify client to exit
 	 */
 
@@ -337,7 +338,13 @@ void updateclient(struct con* connection, ConfigData* configs, int numConfigs){
 		configtomessage(configs[j], &message); /*fill in the message using the config*/
 		sendmessage(connection, &message);
 	}
+
+	//send message to client that the config files are done sending
+	memset(&message, 0, sizeof(SockData));
+	strcpy(message.header, "FIN");
+	sendmessage(connection, &message);
 }
+
 
 /* update the clients to monitor new processes
  * by sending them the processes that were recently 
@@ -418,7 +425,8 @@ int main(int argc,  char *argv[])
 	if (nanny_log == NULL)
 		perror("procnanny.server: failure to get env var PROCNANNYLOGS");
 
-	ReportServerStarted(stdout, host_pid, hostname, MYPORT);
+	//this was determined to be "extraneous output"
+	//ReportServerStarted(stdout, host_pid, hostname, MYPORT);
 	ReportServerStartedFile(nanny_log, host_pid, hostname, MYPORT);
 	ReportServerStartedFile2(serv_info, host_pid, hostname, MYPORT);
 	FlushLogger(nanny_log);
@@ -602,7 +610,7 @@ int main(int argc,  char *argv[])
 					char from[128];
 					memset(from, 0, 128);
 					memcpy(&cp->sa, &sa, sizeof(sa));
-					if (!getnameinfo((struct sockaddr*) &cp->sa, (socklen_t) cp->slen, from, 128, NULL, 0, 0))
+					if (getnameinfo((struct sockaddr*) &cp->sa, (socklen_t) cp->slen, from, 128, NULL, 0, 0))
 							perror("procnanny.server, unable to resolve client host name");
 					memcpy(cp->hostname, from, 128);
 
@@ -619,9 +627,7 @@ int main(int argc,  char *argv[])
 				    FD_ISSET(connections[i].sd, readable))
 				{
 					if (handleread(&connections[i]) > 0){
-						/*char from[128];
-						memset(from, 0, 128);
-						*/
+
 						struct con cp = connections[i]; 
 						SockData* sockdata = (SockData*) cp.buf;
 
@@ -630,8 +636,8 @@ int main(int argc,  char *argv[])
 							perror("procnanny.server, unable to resolve client host name"); */
 
 						/* we need to log processes that are killed / timed out */
-						printf("Recieved SockData from %s: with header=[%s] and process=[%s] and killTime=[%d]\n", cp.hostname,
-							sockdata->header, sockdata->process.CMD, sockdata->process.killTime);
+						//printf("Recieved SockData from %s: with header=[%s] and process=[%s] and killTime=[%d]\n", cp.hostname,
+							//sockdata->header, sockdata->process.CMD, sockdata->process.killTime);
 
 						if (!strcmp(sockdata->header, "NOT")) {
 							//process does not exist on client
@@ -674,11 +680,10 @@ int main(int argc,  char *argv[])
 
 	//replace ',' with '.' at the end of the string
 	*(location-1) = 46;
-
 	ReportTotalProcessesKilled(nanny_log, numkilled, nodes);
 
 	ReportSigintCaught(stdout, numkilled, nodes);
-	ReportSigintCaughtFile(serv_info, numkilled, nodes);
+	ReportSigintCaughtFile(nanny_log, numkilled, nodes);
 	
 	FlushLogger(nanny_log);
 	closeclients();
