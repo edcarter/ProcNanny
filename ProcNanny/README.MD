@@ -1,16 +1,5 @@
 *NIX process monitor for killing off runaway processes.
 
-Elias Carter
-1359203
-edcarter
-
-lec section EA1
-Paul Lu
-
-lab section ED04
-Luke Kukmar
-
-
 CALLING CONVENTION:
 	procnanny <nanny.config location>
 	Environment Variable "PROCNANNYLOGS" set to name in existing directory 
